@@ -3,11 +3,11 @@ import { Store } from '@ngrx/store';
 import { save } from '../samples/samples.actions';
 
 @Component({
-  selector: 'app-select-sample',
-  templateUrl: './select-sample.component.html',
-  styleUrls: ['./select-sample.component.scss']
+  selector: 'app-sample-selector',
+  templateUrl: './sample-selector.component.html',
+  styleUrls: ['./sample-selector.component.scss']
 })
-export class SelectSampleComponent implements OnInit {
+export class SampleSelectorComponent implements OnInit {
   constructor(private store: Store) {}
 
   ngOnInit(): void {}

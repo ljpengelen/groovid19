@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { SelectSampleComponent } from './select-sample/select-sample.component';
+import { SampleSelectorComponent } from './sample-selector/sample-selector.component';
 import { GrooveBoxComponent } from './groove-box/groove-box.component';
 import { StoreModule } from '@ngrx/store';
 import { SamplePlayerComponent } from './sample-player/sample-player.component';
@@ -12,7 +12,7 @@ import { samplesReducer } from './samples/samples.reducer';
 @NgModule({
   declarations: [
     AppComponent,
-    SelectSampleComponent,
+    SampleSelectorComponent,
     GrooveBoxComponent,
     SamplePlayerComponent
   ],
