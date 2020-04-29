@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Store, select } from '@ngrx/store';
 
 @Component({
@@ -6,11 +6,11 @@ import { Store, select } from '@ngrx/store';
   templateUrl: './sample-player.component.html',
   styleUrls: ['./sample-player.component.scss']
 })
-export class SamplePlayerComponent implements OnInit {
+export class SamplePlayerComponent {
   private audioContext: AudioContext;
   private sample?: AudioBuffer;
 
-  constructor(public store: Store<{ samples: { encodedSample?: string } }>) {
+  constructor(store: Store<{ samples: { encodedSample?: string } }>) {
     const audioContextClass = window.AudioContext || window.webkitAudioContext;
     this.audioContext = new audioContextClass();
 
@@ -30,8 +30,6 @@ export class SamplePlayerComponent implements OnInit {
         }
       });
   }
-
-  ngOnInit(): void {}
 
   play() {
     if (this.sample) {
