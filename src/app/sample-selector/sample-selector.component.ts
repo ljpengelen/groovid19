@@ -13,7 +13,7 @@ export class SampleSelectorComponent implements OnInit {
   ngOnInit(): void {}
 
   storeSample(files: FileList) {
-    if (files) {
+    if (files.length === 1) {
       const fileReader = new FileReader();
       fileReader.onload = () => {
         this.store.dispatch(
