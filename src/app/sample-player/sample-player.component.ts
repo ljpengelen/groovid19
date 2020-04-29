@@ -25,7 +25,7 @@ export class SamplePlayerComponent implements OnInit {
           this.audioContext.decodeAudioData(
             ab,
             (buffer) => (this.sample = buffer),
-            (e) => console.log('Error with decoding audio data ' + e.message)
+            (e) => console.error('Error with decoding audio data ' + e.message)
           );
         }
       });
