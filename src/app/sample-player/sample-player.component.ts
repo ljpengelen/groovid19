@@ -7,8 +7,8 @@ import { Store, select } from '@ngrx/store';
   styleUrls: ['./sample-player.component.scss']
 })
 export class SamplePlayerComponent implements OnInit {
-  audioContext: AudioContext;
-  sample?: AudioBuffer;
+  private audioContext: AudioContext;
+  private sample?: AudioBuffer;
 
   constructor(public store: Store<{ samples: { encodedSample?: string } }>) {
     const audioContextClass = window.AudioContext || window.webkitAudioContext;
