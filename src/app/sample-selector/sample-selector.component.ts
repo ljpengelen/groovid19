@@ -16,18 +16,11 @@ export class SampleSelectorComponent implements OnInit {
     if (files) {
       const fileReader = new FileReader();
       fileReader.onload = () => {
-        console.log(fileReader.result);
         this.store.dispatch(
           save({ encodedSample: fileReader.result as string })
         );
       };
       fileReader.readAsDataURL(files[0]);
-
-      const otherFileReader = new FileReader();
-      otherFileReader.onload = () => {
-        console.log(otherFileReader.result);
-      };
-      otherFileReader.readAsArrayBuffer(files[0]);
     }
   }
 }
