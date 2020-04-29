@@ -1,6 +1,12 @@
 import { Component } from '@angular/core';
 import { Store, select } from '@ngrx/store';
 
+const LOOKAHEAD_IN_SECONDS = 0.1;
+const SCHEDULING_INTERVAL_IN_MS = 25;
+
+const BEATS_PER_MINUTE = 120;
+const SECONDS_PER_TICK = 60 / BEATS_PER_MINUTE / 4;
+
 @Component({
   selector: 'app-sample-player',
   templateUrl: './sample-player.component.html',
@@ -9,8 +15,20 @@ import { Store, select } from '@ngrx/store';
 export class SamplePlayerComponent {
   private audioContext: AudioContext;
   private sample?: AudioBuffer;
+  private pattern: boolean[];
 
-  constructor(store: Store<{ samples: { encodedSample?: string } }>) {
+  private isPlaying: boolean = false;
+  private timerId: number;
+
+  private nextNoteStartTime: number = 0;
+  private currentTick: number = 0;
+
+  constructor(
+    store: Store<{
+      patterns: { pattern: boolean[] };
+      samples: { encodedSample?: string };
+    }>
+  ) {
     const audioContextClass = window.AudioContext || window.webkitAudioContext;
     this.audioContext = new audioContextClass();
 
@@ -29,14 +47,54 @@ export class SamplePlayerComponent {
           );
         }
       });
+
+    store
+      .pipe(select('patterns'), select('pattern'))
+      .subscribe((pattern) => (this.pattern = pattern));
   }
 
-  play() {
+  private scheduleSample(startTime: number) {
     if (this.sample) {
       const source = this.audioContext.createBufferSource();
       source.buffer = this.sample;
       source.connect(this.audioContext.destination);
-      source.start();
+      source.start(startTime);
     }
+  }
+
+  private scheduleSamples(): void {
+    while (
+      this.nextNoteStartTime <
+      this.audioContext.currentTime + LOOKAHEAD_IN_SECONDS
+    ) {
+      if (this.pattern[this.currentTick]) {
+        this.scheduleSample(this.nextNoteStartTime);
+      }
+
+      this.nextNoteStartTime += SECONDS_PER_TICK;
+
+      ++this.currentTick;
+      if (this.currentTick === 16) {
+        this.currentTick = 0;
+      }
+    }
+
+    this.timerId = window.setTimeout(
+      this.scheduleSamples.bind(this),
+      SCHEDULING_INTERVAL_IN_MS
+    );
+  }
+
+  play() {
+    if (this.isPlaying) {
+      window.clearTimeout(this.timerId);
+      this.isPlaying = false;
+      return;
+    }
+
+    this.nextNoteStartTime = this.audioContext.currentTime;
+    this.currentTick = 0;
+    this.isPlaying = true;
+    this.scheduleSamples();
   }
 }
