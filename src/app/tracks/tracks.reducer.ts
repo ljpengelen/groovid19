@@ -1,7 +1,7 @@
 import { Action, createReducer, on } from '@ngrx/store';
 import { createTrack } from './tracks.actions';
 
-interface Track {
+export interface Track {
   id: string;
 }
 
@@ -9,13 +9,15 @@ export interface State {
   byId: { [id: string]: Track };
 }
 
-export const initialState = {};
+export const initialState = {
+  byId: {}
+};
 
 const _tracksReducer = createReducer(
   initialState,
   on(createTrack, (state: State, { id }) => ({
     ...state,
-    byId: { ...state.byId, id: { id } }
+    byId: { ...state.byId, [id]: { id } }
   }))
 );
 
