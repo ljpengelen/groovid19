@@ -11,6 +11,7 @@ import { SamplePlayerComponent } from './sample-player/sample-player.component';
 import { samplesReducer } from './samples/samples.reducer';
 import { KeyPadComponent } from './key-pad/key-pad.component';
 import { KeyComponent } from './key/key.component';
+import { TrackCreatorComponent } from './track-creator/track-creator.component';
 
 @NgModule({
   declarations: [
@@ -19,7 +20,8 @@ import { KeyComponent } from './key/key.component';
     GrooveBoxComponent,
     SamplePlayerComponent,
     KeyPadComponent,
-    KeyComponent
+    KeyComponent,
+    TrackCreatorComponent
   ],
   imports: [
     BrowserModule,
