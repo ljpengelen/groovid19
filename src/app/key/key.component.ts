@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
-import { setValueAtTick } from '../patterns/patterns.actions';
+import { setValueAtTickForTrack } from '../patterns/patterns.actions';
+import { Pattern } from '../patterns/patterns.reducer';
 import { Store, select } from '@ngrx/store';
 
 @Component({
@@ -9,21 +10,31 @@ import { Store, select } from '@ngrx/store';
 })
 export class KeyComponent {
   @Input() tick: number;
+  @Input() trackId: string;
+
   checked = false;
 
-  constructor(private store: Store<{ patterns: { pattern: boolean[] } }>) {}
+  constructor(
+    private store: Store<{
+      patterns: { byTrackId: { [trackId: string]: Pattern } };
+    }>
+  ) {}
 
   ngOnInit(): void {
     this.store
-      .pipe(select('patterns'), select('pattern'))
-      .subscribe((pattern) => {
-        this.checked = pattern[this.tick];
+      .pipe(select('patterns'), select('byTrackId'))
+      .subscribe((patterns) => {
+        this.checked = patterns[this.trackId].pattern[this.tick];
       });
   }
 
   change() {
     this.store.dispatch(
-      setValueAtTick({ tick: this.tick, value: !this.checked })
+      setValueAtTickForTrack({
+        tick: this.tick,
+        value: !this.checked,
+        trackId: this.trackId
+      })
     );
   }
 }

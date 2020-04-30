@@ -1,4 +1,5 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { Pattern } from '../patterns/patterns.reducer';
 import { Store, select } from '@ngrx/store';
 
 @Component({
@@ -6,14 +7,23 @@ import { Store, select } from '@ngrx/store';
   templateUrl: './key-pad.component.html',
   styleUrls: ['./key-pad.component.scss']
 })
-export class KeyPadComponent {
+export class KeyPadComponent implements OnInit {
   @Input() trackId: string;
 
   ticks: number[] = [];
 
-  constructor(store: Store<{ patterns: { pattern: boolean[] } }>) {
-    store.pipe(select('patterns'), select('pattern')).subscribe((pattern) => {
-      this.ticks = [...pattern.keys()];
-    });
+  constructor(
+    private store: Store<{
+      patterns: { byTrackId: { [trackId: string]: Pattern } };
+    }>
+  ) {}
+
+  ngOnInit() {
+    this.store
+      .pipe(select('patterns'), select('byTrackId'))
+      .subscribe((patterns) => {
+        const pattern = patterns[this.trackId].pattern;
+        this.ticks = [...pattern.keys()];
+      });
   }
 }

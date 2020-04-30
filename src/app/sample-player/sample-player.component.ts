@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { Pattern } from '../patterns/patterns.reducer';
 import { Sample } from '../samples/samples.reducer';
 import { Store, select } from '@ngrx/store';
 
@@ -28,7 +29,7 @@ export class SamplePlayerComponent implements OnInit {
 
   constructor(
     private store: Store<{
-      patterns: { pattern: boolean[] };
+      patterns: { byTrackId: { [id: string]: Pattern } };
       samples: { byTrackId: { [id: string]: Sample } };
     }>
   ) {}
@@ -56,8 +57,8 @@ export class SamplePlayerComponent implements OnInit {
       });
 
     this.store
-      .pipe(select('patterns'), select('pattern'))
-      .subscribe((pattern) => (this.pattern = pattern));
+      .pipe(select('patterns'), select('byTrackId'))
+      .subscribe((patterns) => (this.pattern = patterns[this.trackId].pattern));
   }
 
   private scheduleSample(startTime: number) {

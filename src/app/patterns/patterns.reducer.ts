@@ -1,24 +1,43 @@
 import { Action, createReducer, on } from '@ngrx/store';
-import { setValueAtTick } from './patterns.actions';
+import { createTrack } from '../tracks/tracks.actions';
+import { setValueAtTickForTrack } from './patterns.actions';
 
-export interface State {
+export interface Pattern {
   pattern: boolean[];
 }
 
+export interface State {
+  byTrackId: {
+    [trackId: string]: Pattern;
+  };
+}
+
 export const initialState = {
-  pattern: Array(16).fill(false)
+  byTrackId: {}
 };
 
 const _patternsReducer = createReducer(
   initialState,
-  on(setValueAtTick, (state: State, { tick, value }) => ({
+  on(createTrack, (state: State, { id }) => ({
     ...state,
-    pattern: state.pattern.map((item, index) => {
-      if (index == tick) {
-        return value;
+    byTrackId: {
+      ...state.byTrackId,
+      [id]: { pattern: Array(16).fill(false) }
+    }
+  })),
+  on(setValueAtTickForTrack, (state: State, { value, tick, trackId }) => ({
+    ...state,
+    byTrackId: {
+      ...state.byTrackId,
+      [trackId]: {
+        pattern: state.byTrackId[trackId].pattern.map((item, index) => {
+          if (index == tick) {
+            return value;
+          }
+          return item;
+        })
       }
-      return item;
-    })
+    }
   }))
 );
 
