@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { Sample } from '../samples/samples.reducer';
 import { Store, select } from '@ngrx/store';
 
 const LOOKAHEAD_IN_SECONDS = 0.1;
@@ -12,7 +13,9 @@ const SECONDS_PER_TICK = 60 / BEATS_PER_MINUTE / 4;
   templateUrl: './sample-player.component.html',
   styleUrls: ['./sample-player.component.scss']
 })
-export class SamplePlayerComponent {
+export class SamplePlayerComponent implements OnInit {
+  @Input() trackId: string;
+
   private audioContext: AudioContext;
   private sample?: AudioBuffer;
   private pattern: boolean[];
@@ -24,17 +27,21 @@ export class SamplePlayerComponent {
   private currentTick: number = 0;
 
   constructor(
-    store: Store<{
+    private store: Store<{
       patterns: { pattern: boolean[] };
-      samples: { encodedSample?: string };
+      samples: { byTrackId: { [id: string]: Sample } };
     }>
-  ) {
+  ) {}
+
+  ngOnInit() {
     const audioContextClass = window.AudioContext || window.webkitAudioContext;
     this.audioContext = new audioContextClass();
 
-    store
-      .pipe(select('samples'), select('encodedSample'))
-      .subscribe((encodedSample) => {
+    this.store
+      .pipe(select('samples'), select('byTrackId'))
+      .subscribe((samples) => {
+        const encodedSample = samples[this.trackId].encodedSample;
+
         if (encodedSample) {
           const a = encodedSample.substr(encodedSample.indexOf(',') + 1);
           const b = atob(a);
@@ -48,7 +55,7 @@ export class SamplePlayerComponent {
         }
       });
 
-    store
+    this.store
       .pipe(select('patterns'), select('pattern'))
       .subscribe((pattern) => (this.pattern = pattern));
   }

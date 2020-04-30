@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Store, select } from '@ngrx/store';
 
 @Component({
@@ -7,6 +7,8 @@ import { Store, select } from '@ngrx/store';
   styleUrls: ['./key-pad.component.scss']
 })
 export class KeyPadComponent {
+  @Input() trackId: string;
+
   ticks: number[] = [];
 
   constructor(store: Store<{ patterns: { pattern: boolean[] } }>) {

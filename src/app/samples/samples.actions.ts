@@ -1,6 +1,6 @@
 import { createAction, props } from '@ngrx/store';
 
-export const save = createAction(
-  '[Samples] Save',
-  props<{ encodedSample: string }>()
+export const selectSampleForTrack = createAction(
+  '[Samples] Select sample for track',
+  props<{ encodedSample: string; trackId: string }>()
 );

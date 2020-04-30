@@ -1,16 +1,10 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-track',
   templateUrl: './track.component.html',
   styleUrls: ['./track.component.scss']
 })
-export class TrackComponent implements OnInit {
+export class TrackComponent {
   @Input() trackId: string;
-
-  constructor() {}
-
-  ngOnInit(): void {
-    console.log(this.trackId);
-  }
 }

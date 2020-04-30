@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { save } from '../samples/samples.actions';
+import { selectSampleForTrack } from '../samples/samples.actions';
 
 @Component({
   selector: 'app-sample-selector',
@@ -8,6 +8,8 @@ import { save } from '../samples/samples.actions';
   styleUrls: ['./sample-selector.component.scss']
 })
 export class SampleSelectorComponent implements OnInit {
+  @Input() trackId: string;
+
   constructor(private store: Store) {}
 
   ngOnInit(): void {}
@@ -17,7 +19,10 @@ export class SampleSelectorComponent implements OnInit {
       const fileReader = new FileReader();
       fileReader.onload = () => {
         this.store.dispatch(
-          save({ encodedSample: fileReader.result as string })
+          selectSampleForTrack({
+            encodedSample: fileReader.result as string,
+            trackId: this.trackId
+          })
         );
       };
       fileReader.readAsDataURL(files[0]);
