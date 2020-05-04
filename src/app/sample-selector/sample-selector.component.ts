@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { withoutPrefix } from '../lib/data-url';
 import { Store } from '@ngrx/store';
 import { selectSampleForTrack } from '../samples/samples.actions';
 
@@ -20,7 +21,7 @@ export class SampleSelectorComponent implements OnInit {
       fileReader.onload = () => {
         this.store.dispatch(
           selectSampleForTrack({
-            encodedSample: fileReader.result as string,
+            encodedSample: withoutPrefix(fileReader.result as string),
             trackId: this.trackId
           })
         );

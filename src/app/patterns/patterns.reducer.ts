@@ -6,7 +6,7 @@ export interface Pattern {
   pattern: boolean[];
 }
 
-export interface State {
+export interface PatternsState {
   byTrackId: {
     [trackId: string]: Pattern;
   };
@@ -18,29 +18,35 @@ export const initialState = {
 
 const _patternsReducer = createReducer(
   initialState,
-  on(createTrack, (state: State, { id }) => ({
+  on(createTrack, (state: PatternsState, { id }) => ({
     ...state,
     byTrackId: {
       ...state.byTrackId,
       [id]: { pattern: Array(16).fill(false) }
     }
   })),
-  on(setValueAtTickForTrack, (state: State, { value, tick, trackId }) => ({
-    ...state,
-    byTrackId: {
-      ...state.byTrackId,
-      [trackId]: {
-        pattern: state.byTrackId[trackId].pattern.map((item, index) => {
-          if (index == tick) {
-            return value;
-          }
-          return item;
-        })
+  on(
+    setValueAtTickForTrack,
+    (state: PatternsState, { value, tick, trackId }) => ({
+      ...state,
+      byTrackId: {
+        ...state.byTrackId,
+        [trackId]: {
+          pattern: state.byTrackId[trackId].pattern.map((item, index) => {
+            if (index == tick) {
+              return value;
+            }
+            return item;
+          })
+        }
       }
-    }
-  }))
+    })
+  )
 );
 
-export function patternsReducer(state: State | undefined, action: Action) {
+export function patternsReducer(
+  state: PatternsState | undefined,
+  action: Action
+) {
   return _patternsReducer(state, action);
 }

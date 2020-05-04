@@ -1,13 +1,17 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
+import { EffectsModule } from '@ngrx/effects';
+import { StoreModule } from '@ngrx/store';
+
+import { AudioBufferCacheEffects } from './audio-buffer-cache/audio-buffer-cache.effects';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SampleSelectorComponent } from './sample-selector/sample-selector.component';
 import { GrooveBoxComponent } from './groove-box/groove-box.component';
+import { GrooveBoxEffects } from './groove-box/groove-box.effects';
 import { grooveBoxReducer } from './groove-box/groove-box.reducer';
 import { patternsReducer } from './patterns/patterns.reducer';
-import { StoreModule } from '@ngrx/store';
 import { SamplePlayerComponent } from './sample-player/sample-player.component';
 import { samplesReducer } from './samples/samples.reducer';
 import { tracksReducer } from './tracks/tracks.reducer';
@@ -40,7 +44,8 @@ import { TracksPlayerComponent } from './tracks-player/tracks-player.component';
         tracks: tracksReducer
       },
       {}
-    )
+    ),
+    EffectsModule.forRoot([AudioBufferCacheEffects, GrooveBoxEffects])
   ],
   providers: [],
   bootstrap: [AppComponent]

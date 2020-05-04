@@ -5,7 +5,7 @@ export interface Track {
   id: string;
 }
 
-export interface State {
+export interface TracksState {
   byId: { [id: string]: Track };
 }
 
@@ -15,12 +15,12 @@ export const initialState = {
 
 const _tracksReducer = createReducer(
   initialState,
-  on(createTrack, (state: State, { id }) => ({
+  on(createTrack, (state: TracksState, { id }) => ({
     ...state,
     byId: { ...state.byId, [id]: { id } }
   }))
 );
 
-export function tracksReducer(state: State | undefined, action: Action) {
+export function tracksReducer(state: TracksState | undefined, action: Action) {
   return _tracksReducer(state, action);
 }

@@ -1,7 +1,7 @@
 import { Action, createReducer, on } from '@ngrx/store';
 import { togglePlayAllTracks } from './groove-box.actions';
 
-export interface State {
+export interface GrooveBoxState {
   isPlaying: boolean;
 }
 
@@ -11,12 +11,15 @@ export const initialState = {
 
 const _grooveBoxReducer = createReducer(
   initialState,
-  on(togglePlayAllTracks, (state: State) => ({
+  on(togglePlayAllTracks, (state: GrooveBoxState) => ({
     ...state,
     isPlaying: !state.isPlaying
   }))
 );
 
-export function grooveBoxReducer(state: State | undefined, action: Action) {
+export function grooveBoxReducer(
+  state: GrooveBoxState | undefined,
+  action: Action
+) {
   return _grooveBoxReducer(state, action);
 }

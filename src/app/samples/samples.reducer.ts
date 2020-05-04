@@ -6,7 +6,7 @@ export interface Sample {
   encodedSample?: string;
 }
 
-export interface State {
+export interface SamplesState {
   byTrackId: {
     [trackId: string]: Sample;
   };
@@ -28,6 +28,9 @@ const _samplesReducer = createReducer(
   }))
 );
 
-export function samplesReducer(state: State | undefined, action: Action) {
+export function samplesReducer(
+  state: SamplesState | undefined,
+  action: Action
+) {
   return _samplesReducer(state, action);
 }
