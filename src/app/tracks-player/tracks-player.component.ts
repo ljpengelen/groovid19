@@ -8,7 +8,7 @@ import { togglePlayAllTracks } from '../groove-box/groove-box.actions';
   styleUrls: ['./tracks-player.component.scss']
 })
 export class TracksPlayerComponent implements OnInit {
-  @Input() enabled: boolean;
+  @Input() isEnabled: boolean;
   isPlaying = false;
 
   constructor(
