@@ -1,4 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { Store, select } from '@ngrx/store';
+import { togglePlayAllTracks } from '../groove-box/groove-box.actions';
 
 @Component({
   selector: 'app-patterns-player',
@@ -7,8 +9,21 @@ import { Component, Input, OnInit } from '@angular/core';
 })
 export class PatternsPlayerComponent implements OnInit {
   @Input() enabled: boolean;
+  isPlaying = false;
 
-  constructor() {}
+  constructor(
+    private store: Store<{
+      grooveBox: { isPlaying: boolean };
+    }>
+  ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.store.pipe(select('grooveBox', 'isPlaying')).subscribe((isPlaying) => {
+      this.isPlaying = isPlaying;
+    });
+  }
+
+  toggle(): void {
+    this.store.dispatch(togglePlayAllTracks());
+  }
 }

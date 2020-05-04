@@ -1,1 +1,3 @@
-<button [disabled]="!enabled">Play all tracks</button>
+<button [disabled]="!enabled" (click)="toggle()">
+  {{ isPlaying ? 'Stop all tracks' : 'Play all tracks' }}
+</button>
