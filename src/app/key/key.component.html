@@ -1,1 +1,6 @@
-<input type="checkbox" (change)="change()" [checked]="checked" />
+<input
+  [class.lastOfBeat]="(tick + 1) % 4 === 0"
+  type="checkbox"
+  (change)="change()"
+  [checked]="checked"
+/>
