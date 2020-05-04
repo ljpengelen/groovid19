@@ -1,0 +1,8 @@
+<input
+  #input
+  type="range"
+  min="50"
+  max="220"
+  [value]="tempo"
+  (input)="setTempo(input.value)"
+/>{{ tempo }}

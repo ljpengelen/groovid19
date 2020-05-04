@@ -1,5 +1,6 @@
 <div class="grooveBox">
   <app-tracks-player [isEnabled]="trackIds.length > 0"></app-tracks-player>
+  <app-tempo-selector></app-tempo-selector>
   <app-track-creator></app-track-creator>
   <app-track *ngFor="let trackId of trackIds" [trackId]="trackId"></app-track>
 </div>

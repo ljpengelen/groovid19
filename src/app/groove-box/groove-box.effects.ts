@@ -10,13 +10,11 @@ import { concatMap, tap, withLatestFrom } from 'rxjs/operators';
 const LOOKAHEAD_IN_SECONDS = 0.1;
 const SCHEDULING_INTERVAL_IN_MS = 25;
 
-const BEATS_PER_MINUTE = 120;
-const SECONDS_PER_TICK = 60 / BEATS_PER_MINUTE / 4;
-
 @Injectable()
 export class GrooveBoxEffects {
   private isPlaying = false;
   private patterns: PatternsState;
+  private tempo: number;
 
   private audioContext: AudioContext;
 
@@ -44,6 +42,8 @@ export class GrooveBoxEffects {
   }
 
   private play() {
+    const secondsPerTick = 60 / this.tempo / 4;
+
     while (
       this.nextNoteStartTime <
       this.audioContext.currentTime + LOOKAHEAD_IN_SECONDS
@@ -52,7 +52,7 @@ export class GrooveBoxEffects {
         this.schedulePatternForTrack(trackId)
       );
 
-      this.nextNoteStartTime += SECONDS_PER_TICK;
+      this.nextNoteStartTime += secondsPerTick;
 
       ++this.currentTick;
       if (this.currentTick === 16) {
@@ -88,14 +88,15 @@ export class GrooveBoxEffects {
         concatMap((action) =>
           of(action).pipe(
             withLatestFrom(
-              this.store.pipe(select('grooveBox', 'isPlaying')),
+              this.store.pipe(select('grooveBox')),
               this.store.pipe(select('patterns'))
             )
           )
         ),
         tap((action) => {
           this.patterns = action[2];
-          this.toggle(action[1]);
+          this.tempo = action[1].tempo;
+          this.toggle(action[1].isPlaying);
         })
       ),
     { dispatch: false }

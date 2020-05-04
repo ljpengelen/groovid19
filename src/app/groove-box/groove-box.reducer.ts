@@ -1,12 +1,14 @@
 import { Action, createReducer, on } from '@ngrx/store';
-import { togglePlayAllTracks } from './groove-box.actions';
+import { setTempo, togglePlayAllTracks } from './groove-box.actions';
 
 export interface GrooveBoxState {
   isPlaying: boolean;
+  tempo: number;
 }
 
 export const initialState = {
-  isPlaying: false
+  isPlaying: false,
+  tempo: 120
 };
 
 const _grooveBoxReducer = createReducer(
@@ -14,6 +16,10 @@ const _grooveBoxReducer = createReducer(
   on(togglePlayAllTracks, (state: GrooveBoxState) => ({
     ...state,
     isPlaying: !state.isPlaying
+  })),
+  on(setTempo, (state: GrooveBoxState, { tempo }) => ({
+    ...state,
+    tempo
   }))
 );
 
