@@ -1,11 +1,12 @@
 import { Actions, createEffect } from '@ngrx/effects';
 import { audioBufferCache } from '../audio-buffer-cache/audio-buffer-cache';
+import { concatMap, tap, withLatestFrom } from 'rxjs/operators';
 import { GrooveBoxState } from './groove-box.reducer';
 import { Injectable } from '@angular/core';
 import { of } from 'rxjs';
 import { PatternsState } from '../patterns/patterns.reducer';
 import { Store, select } from '@ngrx/store';
-import { concatMap, tap, withLatestFrom } from 'rxjs/operators';
+import { TracksState } from '../tracks/tracks.reducer';
 
 const LOOKAHEAD_IN_SECONDS = 0.1;
 const SCHEDULING_INTERVAL_IN_MS = 25;
@@ -15,6 +16,7 @@ export class GrooveBoxEffects {
   private isPlaying = false;
   private patterns: PatternsState;
   private tempo: number;
+  private tracks: TracksState;
 
   private audioContext: AudioContext;
 
@@ -23,20 +25,24 @@ export class GrooveBoxEffects {
 
   private timerId: number;
 
-  private scheduleSample(sample: AudioBuffer) {
+  private scheduleSample(sample: AudioBuffer, volume: number) {
     const source = this.audioContext.createBufferSource();
+    const gain = this.audioContext.createGain();
+    gain.gain.value = volume / 100;
     source.buffer = sample;
-    source.connect(this.audioContext.destination);
+    source.connect(gain);
+    gain.connect(this.audioContext.destination);
     source.start(this.nextNoteStartTime);
   }
 
   private schedulePatternForTrack(trackId: string) {
     const sample = audioBufferCache.get(trackId);
     const pattern = this.patterns.byTrackId[trackId].pattern;
+    const volume = this.tracks.byId[trackId].volume;
 
     if (sample) {
       if (pattern[this.currentTick]) {
-        this.scheduleSample(sample);
+        this.scheduleSample(sample, volume);
       }
     }
   }
@@ -89,13 +95,15 @@ export class GrooveBoxEffects {
           of(action).pipe(
             withLatestFrom(
               this.store.pipe(select('grooveBox')),
-              this.store.pipe(select('patterns'))
+              this.store.pipe(select('patterns')),
+              this.store.pipe(select('tracks'))
             )
           )
         ),
         tap((action) => {
           this.patterns = action[2];
           this.tempo = action[1].tempo;
+          this.tracks = action[3];
           this.toggle(action[1].isPlaying);
         })
       ),
@@ -107,6 +115,7 @@ export class GrooveBoxEffects {
     private store: Store<{
       grooveBox: GrooveBoxState;
       patterns: PatternsState;
+      tracks: TracksState;
     }>
   ) {
     const audioContextClass = window.AudioContext || window.webkitAudioContext;

@@ -27,6 +27,7 @@ import { TrackCreatorComponent } from './track-creator/track-creator.component';
 import { TrackComponent } from './track/track.component';
 import { TracksPlayerComponent } from './tracks-player/tracks-player.component';
 import { TempoSelectorComponent } from './tempo-selector/tempo-selector.component';
+import { TrackVolumeSelectorComponent } from './track-volume-selector/track-volume-selector.component';
 
 const reducers: ActionReducerMap<any> = {
   grooveBox: grooveBoxReducer,
@@ -55,7 +56,8 @@ const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
     TrackCreatorComponent,
     TrackComponent,
     TracksPlayerComponent,
-    TempoSelectorComponent
+    TempoSelectorComponent,
+    TrackVolumeSelectorComponent
   ],
   imports: [
     BrowserModule,

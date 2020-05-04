@@ -1,8 +1,9 @@
 import { Action, createReducer, on } from '@ngrx/store';
-import { createTrack } from './tracks.actions';
+import { createTrack, setVolumeForTrack } from './tracks.actions';
 
 export interface Track {
   id: string;
+  volume: number;
 }
 
 export interface TracksState {
@@ -17,7 +18,17 @@ const _tracksReducer = createReducer(
   initialState,
   on(createTrack, (state: TracksState, { id }) => ({
     ...state,
-    byId: { ...state.byId, [id]: { id } }
+    byId: { ...state.byId, [id]: { id, volume: 100 } }
+  })),
+  on(setVolumeForTrack, (state: TracksState, { volume, trackId }) => ({
+    ...state,
+    byId: {
+      ...state.byId,
+      [trackId]: {
+        ...state.byId[trackId],
+        volume
+      }
+    }
   }))
 );
 
