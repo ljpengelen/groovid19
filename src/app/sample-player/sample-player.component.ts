@@ -1,90 +1,29 @@
 import { audioBufferCache } from '../audio-buffer-cache/audio-buffer-cache';
-import { Component, Input, OnInit } from '@angular/core';
-import { Pattern } from '../patterns/patterns.reducer';
-import { Store, select } from '@ngrx/store';
-
-const LOOKAHEAD_IN_SECONDS = 0.1;
-const SCHEDULING_INTERVAL_IN_MS = 25;
-
-const BEATS_PER_MINUTE = 120;
-const SECONDS_PER_TICK = 60 / BEATS_PER_MINUTE / 4;
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-sample-player',
   templateUrl: './sample-player.component.html',
   styleUrls: ['./sample-player.component.scss']
 })
-export class SamplePlayerComponent implements OnInit {
+export class SamplePlayerComponent {
   @Input() trackId: string;
 
   private audioContext: AudioContext;
-  private pattern: boolean[];
 
-  private isPlaying: boolean = false;
-  private timerId: number;
-
-  private nextNoteStartTime: number = 0;
-  private currentTick: number = 0;
-
-  constructor(
-    private store: Store<{
-      patterns: { byTrackId: { [id: string]: Pattern } };
-    }>
-  ) {}
-
-  ngOnInit() {
+  constructor() {
     const audioContextClass = window.AudioContext || window.webkitAudioContext;
     this.audioContext = new audioContextClass();
-
-    this.store
-      .pipe(select('patterns', 'byTrackId'))
-      .subscribe((patterns) => (this.pattern = patterns[this.trackId].pattern));
   }
 
-  private scheduleSample(startTime: number) {
+  play() {
     const sample = audioBufferCache.get(this.trackId);
 
     if (sample) {
       const source = this.audioContext.createBufferSource();
       source.buffer = sample;
       source.connect(this.audioContext.destination);
-      source.start(startTime);
+      source.start(0);
     }
-  }
-
-  private scheduleSamples(): void {
-    while (
-      this.nextNoteStartTime <
-      this.audioContext.currentTime + LOOKAHEAD_IN_SECONDS
-    ) {
-      if (this.pattern[this.currentTick]) {
-        this.scheduleSample(this.nextNoteStartTime);
-      }
-
-      this.nextNoteStartTime += SECONDS_PER_TICK;
-
-      ++this.currentTick;
-      if (this.currentTick === 16) {
-        this.currentTick = 0;
-      }
-    }
-
-    this.timerId = window.setTimeout(
-      this.scheduleSamples.bind(this),
-      SCHEDULING_INTERVAL_IN_MS
-    );
-  }
-
-  play() {
-    if (this.isPlaying) {
-      window.clearTimeout(this.timerId);
-      this.isPlaying = false;
-      return;
-    }
-
-    this.nextNoteStartTime = this.audioContext.currentTime;
-    this.currentTick = 0;
-    this.isPlaying = true;
-    this.scheduleSamples();
   }
 }
