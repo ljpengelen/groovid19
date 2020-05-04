@@ -3,11 +3,11 @@ import { Store, select } from '@ngrx/store';
 import { togglePlayAllTracks } from '../groove-box/groove-box.actions';
 
 @Component({
-  selector: 'app-patterns-player',
-  templateUrl: './patterns-player.component.html',
-  styleUrls: ['./patterns-player.component.scss']
+  selector: 'app-tracks-player',
+  templateUrl: './tracks-player.component.html',
+  styleUrls: ['./tracks-player.component.scss']
 })
-export class PatternsPlayerComponent implements OnInit {
+export class TracksPlayerComponent implements OnInit {
   @Input() enabled: boolean;
   isPlaying = false;
 

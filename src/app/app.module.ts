@@ -15,7 +15,7 @@ import { KeyPadComponent } from './key-pad/key-pad.component';
 import { KeyComponent } from './key/key.component';
 import { TrackCreatorComponent } from './track-creator/track-creator.component';
 import { TrackComponent } from './track/track.component';
-import { PatternsPlayerComponent } from './patterns-player/patterns-player.component';
+import { TracksPlayerComponent } from './tracks-player/tracks-player.component';
 
 @NgModule({
   declarations: [
@@ -27,7 +27,7 @@ import { PatternsPlayerComponent } from './patterns-player/patterns-player.compo
     KeyComponent,
     TrackCreatorComponent,
     TrackComponent,
-    PatternsPlayerComponent
+    TracksPlayerComponent
   ],
   imports: [
     BrowserModule,
