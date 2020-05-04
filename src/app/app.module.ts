@@ -2,7 +2,13 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
 import { EffectsModule } from '@ngrx/effects';
-import { StoreModule } from '@ngrx/store';
+import { localStorageSync } from 'ngrx-store-localstorage';
+import {
+  ActionReducer,
+  ActionReducerMap,
+  MetaReducer,
+  StoreModule
+} from '@ngrx/store';
 
 import { AudioBufferCacheEffects } from './audio-buffer-cache/audio-buffer-cache.effects';
 import { AppRoutingModule } from './app-routing.module';
@@ -21,6 +27,22 @@ import { TrackCreatorComponent } from './track-creator/track-creator.component';
 import { TrackComponent } from './track/track.component';
 import { TracksPlayerComponent } from './tracks-player/tracks-player.component';
 
+const reducers: ActionReducerMap<any> = {
+  grooveBox: grooveBoxReducer,
+  patterns: patternsReducer,
+  samples: samplesReducer,
+  tracks: tracksReducer
+};
+
+export function localStorageSyncReducer(
+  reducer: ActionReducer<any>
+): ActionReducer<any> {
+  return localStorageSync({ keys: Object.keys(reducers), rehydrate: true })(
+    reducer
+  );
+}
+const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -36,15 +58,7 @@ import { TracksPlayerComponent } from './tracks-player/tracks-player.component';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    StoreModule.forRoot(
-      {
-        grooveBox: grooveBoxReducer,
-        patterns: patternsReducer,
-        samples: samplesReducer,
-        tracks: tracksReducer
-      },
-      {}
-    ),
+    StoreModule.forRoot(reducers, { metaReducers }),
     EffectsModule.forRoot([AudioBufferCacheEffects, GrooveBoxEffects])
   ],
   providers: [],
