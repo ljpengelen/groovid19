@@ -34,12 +34,14 @@ export class GrooveBoxEffects {
     offset: number
   ) {
     const source = this.audioContext.createBufferSource();
-    const gain = this.gainNodeCache.get(trackId);
-    gain.gain.value = volume / 100;
+    const gainNode = this.gainNodeCache.get(trackId);
+    const startTime = this.nextNoteStartTime + offset;
+
+    gainNode.gain.exponentialRampToValueAtTime(volume / 100, startTime);
     source.buffer = sample;
-    source.connect(gain);
-    gain.connect(this.audioContext.destination);
-    source.start(this.nextNoteStartTime + offset);
+    source.connect(gainNode);
+    gainNode.connect(this.audioContext.destination);
+    source.start(startTime);
   }
 
   private schedulePatternForTrack(trackId: string, secondsPerTick: number) {
