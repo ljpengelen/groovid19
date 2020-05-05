@@ -5,6 +5,11 @@ export const createTrack = createAction(
   props<{ id: string }>()
 );
 
+export const setNameForTrack = createAction(
+  '[Tracks] Set name for track',
+  props<{ name: string; trackId: string }>()
+);
+
 export const setSwingForTrack = createAction(
   '[Tracks] Set swing for track',
   props<{ swing: number; trackId: string }>()

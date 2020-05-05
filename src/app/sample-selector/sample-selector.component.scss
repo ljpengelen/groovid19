@@ -1,1 +1,10 @@
-// Placeholder
+.name {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 12rem;
+}
+
+.sample-selector {
+    display: flex;
+}

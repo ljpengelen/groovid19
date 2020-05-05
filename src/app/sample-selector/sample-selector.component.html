@@ -1,6 +1,9 @@
-<input
-  #input
-  type="file"
-  accept="audio/*"
-  (change)="storeSample(input.files)"
-/>
+<label class="sample-selector">
+  <input
+    #input
+    type="file"
+    accept="audio/*"
+    (change)="storeSample(input.files)"
+  />
+  <span class="name">{{ name }}</span>
+</label>
