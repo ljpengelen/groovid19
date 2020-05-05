@@ -3,11 +3,11 @@ import { Pattern } from '../patterns/patterns.reducer';
 import { Store, select } from '@ngrx/store';
 
 @Component({
-  selector: 'app-key-pad',
-  templateUrl: './key-pad.component.html',
-  styleUrls: ['./key-pad.component.scss']
+  selector: 'app-rhythmic-key-pad',
+  templateUrl: './rhythmic-key-pad.component.html',
+  styleUrls: ['./rhythmic-key-pad.component.scss']
 })
-export class KeyPadComponent implements OnInit {
+export class RhythmicKeyPadComponent implements OnInit {
   @Input() trackId: string;
 
   ticks: number[] = [];

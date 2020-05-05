@@ -21,8 +21,8 @@ import { patternsReducer } from './patterns/patterns.reducer';
 import { SamplePlayerComponent } from './sample-player/sample-player.component';
 import { samplesReducer } from './samples/samples.reducer';
 import { tracksReducer } from './tracks/tracks.reducer';
-import { KeyPadComponent } from './key-pad/key-pad.component';
 import { KeyComponent } from './key/key.component';
+import { RhythmicKeyPadComponent } from './rhythmic-key-pad/rhythmic-key-pad.component';
 import { TrackCreatorComponent } from './track-creator/track-creator.component';
 import { TrackComponent } from './track/track.component';
 import { TracksPlayerComponent } from './tracks-player/tracks-player.component';
@@ -52,8 +52,8 @@ const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
     SampleSelectorComponent,
     GrooveBoxComponent,
     SamplePlayerComponent,
-    KeyPadComponent,
     KeyComponent,
+    RhythmicKeyPadComponent,
     TrackCreatorComponent,
     TrackComponent,
     TracksPlayerComponent,
