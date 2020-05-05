@@ -1,6 +1,7 @@
 import { Actions, createEffect } from '@ngrx/effects';
 import { audioBufferCache } from '../audio-buffer-cache/audio-buffer-cache';
 import { concatMap, tap, withLatestFrom } from 'rxjs/operators';
+import { GainNodeCache } from '../gain-node-cache/gain-node-cache';
 import { GrooveBoxState } from './groove-box.reducer';
 import { Injectable } from '@angular/core';
 import { of } from 'rxjs';
@@ -19,15 +20,16 @@ export class GrooveBoxEffects {
   private tracks: TracksState;
 
   private audioContext: AudioContext;
+  private gainNodeCache: GainNodeCache;
 
   private nextNoteStartTime: number = 0;
   private currentTick: number = 0;
 
   private timerId: number;
 
-  private scheduleSample(sample: AudioBuffer, volume: number) {
+  private scheduleSample(sample: AudioBuffer, volume: number, trackId: string) {
     const source = this.audioContext.createBufferSource();
-    const gain = this.audioContext.createGain();
+    const gain = this.gainNodeCache.get(trackId);
     gain.gain.value = volume / 100;
     source.buffer = sample;
     source.connect(gain);
@@ -42,7 +44,7 @@ export class GrooveBoxEffects {
 
     if (sample) {
       if (pattern[this.currentTick]) {
-        this.scheduleSample(sample, volume);
+        this.scheduleSample(sample, volume, trackId);
       }
     }
   }
@@ -120,5 +122,6 @@ export class GrooveBoxEffects {
   ) {
     const audioContextClass = window.AudioContext || window.webkitAudioContext;
     this.audioContext = new audioContextClass();
+    this.gainNodeCache = new GainNodeCache(this.audioContext);
   }
 }
