@@ -27,24 +27,34 @@ export class GrooveBoxEffects {
 
   private timerId: number;
 
-  private scheduleSample(sample: AudioBuffer, volume: number, trackId: string) {
+  private scheduleSample(
+    sample: AudioBuffer,
+    volume: number,
+    trackId: string,
+    offset: number
+  ) {
     const source = this.audioContext.createBufferSource();
     const gain = this.gainNodeCache.get(trackId);
     gain.gain.value = volume / 100;
     source.buffer = sample;
     source.connect(gain);
     gain.connect(this.audioContext.destination);
-    source.start(this.nextNoteStartTime);
+    source.start(this.nextNoteStartTime + offset);
   }
 
-  private schedulePatternForTrack(trackId: string) {
+  private schedulePatternForTrack(trackId: string, secondsPerTick: number) {
     const sample = audioBufferCache.get(trackId);
     const pattern = this.patterns.byTrackId[trackId].pattern;
+    const swing = this.tracks.byId[trackId].swing;
     const volume = this.tracks.byId[trackId].volume;
 
     if (sample) {
       if (pattern[this.currentTick]) {
-        this.scheduleSample(sample, volume, trackId);
+        let offset = 0;
+        if (this.currentTick % 2 == 1) {
+          offset = ((swing - 50) / 100) * secondsPerTick;
+        }
+        this.scheduleSample(sample, volume, trackId, offset);
       }
     }
   }
@@ -57,7 +67,7 @@ export class GrooveBoxEffects {
       this.audioContext.currentTime + LOOKAHEAD_IN_SECONDS
     ) {
       Object.keys(this.patterns.byTrackId).map((trackId) =>
-        this.schedulePatternForTrack(trackId)
+        this.schedulePatternForTrack(trackId, secondsPerTick)
       );
 
       this.nextNoteStartTime += secondsPerTick;
