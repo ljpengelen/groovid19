@@ -1,11 +1,22 @@
 import { Action, createReducer, on } from '@ngrx/store';
 import { createTrack } from '../tracks/tracks.actions';
-import { setValueForToneAtTickForTrack } from './melodic-patterns.actions';
+import {
+  setScaleForTrack,
+  setValueForToneAtTickForTrack
+} from './melodic-patterns.actions';
+
+export enum Scale {
+  Major,
+  NaturalMinor,
+  HarmonicMinor,
+  MelodicMinor
+}
 
 export interface MelodicPattern {
   pattern: {
     [tone: number]: boolean;
   }[];
+  scale: Scale;
 }
 
 export interface MelodicPatternsState {
@@ -24,7 +35,17 @@ const _melodicPatternsReducer = createReducer(
     ...state,
     byTrackId: {
       ...state.byTrackId,
-      [id]: { pattern: Array(16).fill({}) }
+      [id]: { pattern: Array(16).fill({}), scale: Scale.Major }
+    }
+  })),
+  on(setScaleForTrack, (state: MelodicPatternsState, { scale, trackId }) => ({
+    ...state,
+    byTrackId: {
+      ...state.byTrackId,
+      [trackId]: {
+        ...state.byTrackId[trackId],
+        scale
+      }
     }
   })),
   on(
@@ -34,6 +55,7 @@ const _melodicPatternsReducer = createReducer(
       byTrackId: {
         ...state.byTrackId,
         [trackId]: {
+          ...state.byTrackId[trackId],
           pattern: state.byTrackId[trackId].pattern.map(
             (currentTick, tickIndex) => {
               if (tickIndex == tick) {

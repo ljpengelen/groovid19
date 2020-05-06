@@ -1,0 +1,8 @@
+<select #select (change)="selectScale(select.value)">
+  <option
+    *ngFor="let scale of scales"
+    value="{{ scale }}"
+    [selected]="scale == selectedScale"
+    >{{ toString[scale] }}</option
+  >
+</select>

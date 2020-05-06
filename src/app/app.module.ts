@@ -32,6 +32,7 @@ import { TempoSelectorComponent } from './tempo-selector/tempo-selector.componen
 import { TrackVolumeSelectorComponent } from './track-volume-selector/track-volume-selector.component';
 import { TrackSwingSelectorComponent } from './track-swing-selector/track-swing-selector.component';
 import { melodicPatternsReducer } from './melodic-patterns/melodic-patterns.reducer';
+import { ScaleSelectorComponent } from './scale-selector/scale-selector.component';
 
 const reducers: ActionReducerMap<any> = {
   grooveBox: grooveBoxReducer,
@@ -65,7 +66,8 @@ const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
     TracksPlayerComponent,
     TempoSelectorComponent,
     TrackVolumeSelectorComponent,
-    TrackSwingSelectorComponent
+    TrackSwingSelectorComponent,
+    ScaleSelectorComponent
   ],
   imports: [
     BrowserModule,

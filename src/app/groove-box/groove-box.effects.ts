@@ -5,7 +5,10 @@ import { of } from 'rxjs';
 import { concatMap, tap, withLatestFrom } from 'rxjs/operators';
 import { audioBufferCache } from '../audio-buffer-cache/audio-buffer-cache';
 import { GainNodeCache } from '../gain-node-cache/gain-node-cache';
-import { MelodicPatternsState } from '../melodic-patterns/melodic-patterns.reducer';
+import {
+  MelodicPatternsState,
+  Scale
+} from '../melodic-patterns/melodic-patterns.reducer';
 import { RhythmicPatternsState } from '../rhythmic-patterns/rhythmic-patterns.reducer';
 import { TracksState } from '../tracks/tracks.reducer';
 import { GrooveBoxState } from './groove-box.reducer';
@@ -13,17 +16,18 @@ import { GrooveBoxState } from './groove-box.reducer';
 const LOOKAHEAD_IN_SECONDS = 0.1;
 const SCHEDULING_INTERVAL_IN_MS = 25;
 
-const majorScale = [0, 2, 4, 5, 7, 9, 11, 12];
-const naturalMinorScale = [0, 2, 3, 5, 7, 8, 10, 12];
-const harmonicMinorScale = [0, 2, 3, 5, 7, 8, 11, 12];
-const melodicMinorScale = [0, 2, 3, 5, 7, 9, 11, 12];
+const INTERVALS_PER_SCALE = {
+  [Scale.Major]: [0, 2, 4, 5, 7, 9, 11, 12],
+  [Scale.NaturalMinor]: [0, 2, 3, 5, 7, 8, 10, 12],
+  [Scale.HarmonicMinor]: [0, 2, 3, 5, 7, 8, 11, 12],
+  [Scale.MelodicMinor]: [0, 2, 3, 5, 7, 9, 11, 12]
+};
 
 const toOffset = (swing: number, secondsPerTick: number) =>
   ((swing - 50) / 100) * secondsPerTick;
 
-const toPitch = (tone: string) => {
-  return naturalMinorScale[parseInt(tone)] * 100;
-};
+const toPitch = (tone: string, scale: Scale) =>
+  INTERVALS_PER_SCALE[scale][parseInt(tone)] * 100;
 
 @Injectable()
 export class GrooveBoxEffects {
@@ -65,6 +69,8 @@ export class GrooveBoxEffects {
     secondsPerTick: number
   ) {
     const sample = audioBufferCache.get(trackId);
+    const scale = this.melodicPatterns.byTrackId[trackId].scale;
+    console.log(scale);
     const tonesAtTick = this.melodicPatterns.byTrackId[trackId].pattern[
       this.currentTick
     ];
@@ -78,7 +84,13 @@ export class GrooveBoxEffects {
           if (this.currentTick % 2 == 1) {
             offset = toOffset(swing, secondsPerTick);
           }
-          this.scheduleSample(sample, volume, trackId, offset, toPitch(tone));
+          this.scheduleSample(
+            sample,
+            volume,
+            trackId,
+            offset,
+            toPitch(tone, scale)
+          );
         }
       });
     }
