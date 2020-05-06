@@ -70,7 +70,6 @@ export class GrooveBoxEffects {
   ) {
     const sample = audioBufferCache.get(trackId);
     const scale = this.melodicPatterns.byTrackId[trackId].scale;
-    console.log(scale);
     const tonesAtTick = this.melodicPatterns.byTrackId[trackId].pattern[
       this.currentTick
     ];
