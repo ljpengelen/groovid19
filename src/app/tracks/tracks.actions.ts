@@ -1,4 +1,5 @@
 import { createAction, props } from '@ngrx/store';
+import { Scale } from './tracks.reducer';
 
 export const createTrack = createAction(
   '[Tracks] Create',
@@ -8,6 +9,11 @@ export const createTrack = createAction(
 export const setNameForTrack = createAction(
   '[Tracks] Set name for track',
   props<{ name: string; trackId: string }>()
+);
+
+export const setScaleForTrack = createAction(
+  '[Melodic patterns] Set scale for track',
+  props<{ scale: Scale; trackId: string }>()
 );
 
 export const setSwingForTrack = createAction(

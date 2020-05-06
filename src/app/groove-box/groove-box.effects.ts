@@ -5,12 +5,9 @@ import { of } from 'rxjs';
 import { concatMap, tap, withLatestFrom } from 'rxjs/operators';
 import { audioBufferCache } from '../audio-buffer-cache/audio-buffer-cache';
 import { GainNodeCache } from '../gain-node-cache/gain-node-cache';
-import {
-  MelodicPatternsState,
-  Scale
-} from '../melodic-patterns/melodic-patterns.reducer';
+import { MelodicPatternsState } from '../melodic-patterns/melodic-patterns.reducer';
 import { RhythmicPatternsState } from '../rhythmic-patterns/rhythmic-patterns.reducer';
-import { TracksState } from '../tracks/tracks.reducer';
+import { Scale, TracksState } from '../tracks/tracks.reducer';
 import { GrooveBoxState } from './groove-box.reducer';
 
 const LOOKAHEAD_IN_SECONDS = 0.1;
@@ -69,7 +66,7 @@ export class GrooveBoxEffects {
     secondsPerTick: number
   ) {
     const sample = audioBufferCache.get(trackId);
-    const scale = this.melodicPatterns.byTrackId[trackId].scale;
+    const scale = this.tracks.byId[trackId].scale;
     const tonesAtTick = this.melodicPatterns.byTrackId[trackId].pattern[
       this.currentTick
     ];

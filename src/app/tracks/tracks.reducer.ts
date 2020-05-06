@@ -2,13 +2,22 @@ import { Action, createReducer, on } from '@ngrx/store';
 import {
   createTrack,
   setNameForTrack,
+  setScaleForTrack,
   setSwingForTrack,
   setVolumeForTrack
 } from './tracks.actions';
 
+export enum Scale {
+  Major,
+  NaturalMinor,
+  HarmonicMinor,
+  MelodicMinor
+}
+
 export interface Track {
   id: string;
   name: string;
+  scale: Scale;
   swing: number;
   volume: number;
 }
@@ -25,7 +34,10 @@ const _tracksReducer = createReducer(
   initialState,
   on(createTrack, (state: TracksState, { id }) => ({
     ...state,
-    byId: { ...state.byId, [id]: { id, name: '', swing: 50, volume: 100 } }
+    byId: {
+      ...state.byId,
+      [id]: { id, name: '', scale: Scale.Major, swing: 50, volume: 100 }
+    }
   })),
   on(setNameForTrack, (state: TracksState, { name, trackId }) => ({
     ...state,
@@ -34,6 +46,16 @@ const _tracksReducer = createReducer(
       [trackId]: {
         ...state.byId[trackId],
         name
+      }
+    }
+  })),
+  on(setScaleForTrack, (state: TracksState, { scale, trackId }) => ({
+    ...state,
+    byId: {
+      ...state.byId,
+      [trackId]: {
+        ...state.byId[trackId],
+        scale
       }
     }
   })),

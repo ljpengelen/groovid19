@@ -1,11 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { isNumber } from 'util';
-import { setScaleForTrack } from '../melodic-patterns/melodic-patterns.actions';
-import {
-  MelodicPatternsState,
-  Scale
-} from '../melodic-patterns/melodic-patterns.reducer';
+import { setScaleForTrack } from '../tracks/tracks.actions';
+import { Scale, TracksState } from '../tracks/tracks.reducer';
 
 @Component({
   selector: 'app-scale-selector',
@@ -20,13 +17,13 @@ export class ScaleSelectorComponent implements OnInit {
 
   constructor(
     private store: Store<{
-      melodicPatterns: MelodicPatternsState;
+      tracks: TracksState;
     }>
   ) {}
 
   ngOnInit(): void {
-    this.store.select('melodicPatterns', 'byTrackId').subscribe((patterns) => {
-      this.selectedScale = patterns[this.trackId].scale;
+    this.store.select('tracks', 'byId').subscribe((tracks) => {
+      this.selectedScale = tracks[this.trackId].scale;
     });
   }
 
