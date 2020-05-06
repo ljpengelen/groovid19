@@ -5,6 +5,7 @@ import { of } from 'rxjs';
 import { concatMap, tap, withLatestFrom } from 'rxjs/operators';
 import { audioBufferCache } from '../audio-buffer-cache/audio-buffer-cache';
 import { GainNodeCache } from '../gain-node-cache/gain-node-cache';
+import { MelodicPatternsState } from '../melodic-patterns/melodic-patterns.reducer';
 import { RhythmicPatternsState } from '../rhythmic-patterns/rhythmic-patterns.reducer';
 import { TracksState } from '../tracks/tracks.reducer';
 import { GrooveBoxState } from './groove-box.reducer';
@@ -12,10 +13,23 @@ import { GrooveBoxState } from './groove-box.reducer';
 const LOOKAHEAD_IN_SECONDS = 0.1;
 const SCHEDULING_INTERVAL_IN_MS = 25;
 
+const majorScale = [0, 2, 4, 5, 7, 9, 11, 12];
+const naturalMinorScale = [0, 2, 3, 5, 7, 8, 10, 12];
+const harmonicMinorScale = [0, 2, 3, 5, 7, 8, 11, 12];
+const melodicMinorScale = [0, 2, 3, 5, 7, 9, 11, 12];
+
+const toOffset = (swing: number, secondsPerTick: number) =>
+  ((swing - 50) / 100) * secondsPerTick;
+
+const toPitch = (tone: string) => {
+  return naturalMinorScale[parseInt(tone)] * 100;
+};
+
 @Injectable()
 export class GrooveBoxEffects {
   private isPlaying = false;
-  private patterns: RhythmicPatternsState;
+  private melodicPatterns: MelodicPatternsState;
+  private rhythmicPatterns: RhythmicPatternsState;
   private tempo: number;
   private tracks: TracksState;
 
@@ -31,7 +45,8 @@ export class GrooveBoxEffects {
     sample: AudioBuffer,
     volume: number,
     trackId: string,
-    offset: number
+    offset: number,
+    pitch: number
   ) {
     const source = this.audioContext.createBufferSource();
     const gainNode = this.gainNodeCache.get(trackId);
@@ -39,14 +54,42 @@ export class GrooveBoxEffects {
 
     gainNode.gain.exponentialRampToValueAtTime(volume / 100, startTime);
     source.buffer = sample;
+    source.detune.value = pitch;
     source.connect(gainNode);
     gainNode.connect(this.audioContext.destination);
     source.start(startTime);
   }
 
-  private schedulePatternForTrack(trackId: string, secondsPerTick: number) {
+  private scheduleMelodicPatternForTrack(
+    trackId: string,
+    secondsPerTick: number
+  ) {
     const sample = audioBufferCache.get(trackId);
-    const pattern = this.patterns.byTrackId[trackId].pattern;
+    const tonesAtTick = this.melodicPatterns.byTrackId[trackId].pattern[
+      this.currentTick
+    ];
+    const swing = this.tracks.byId[trackId].swing;
+    const volume = this.tracks.byId[trackId].volume;
+
+    if (sample) {
+      Object.keys(tonesAtTick).forEach((tone) => {
+        if (tonesAtTick[tone]) {
+          let offset = 0;
+          if (this.currentTick % 2 == 1) {
+            offset = toOffset(swing, secondsPerTick);
+          }
+          this.scheduleSample(sample, volume, trackId, offset, toPitch(tone));
+        }
+      });
+    }
+  }
+
+  private scheduleRhythmicPatternForTrack(
+    trackId: string,
+    secondsPerTick: number
+  ) {
+    const sample = audioBufferCache.get(trackId);
+    const pattern = this.rhythmicPatterns.byTrackId[trackId].pattern;
     const swing = this.tracks.byId[trackId].swing;
     const volume = this.tracks.byId[trackId].volume;
 
@@ -54,9 +97,9 @@ export class GrooveBoxEffects {
       if (pattern[this.currentTick]) {
         let offset = 0;
         if (this.currentTick % 2 == 1) {
-          offset = ((swing - 50) / 100) * secondsPerTick;
+          offset = toOffset(swing, secondsPerTick);
         }
-        this.scheduleSample(sample, volume, trackId, offset);
+        this.scheduleSample(sample, volume, trackId, offset, 0);
       }
     }
   }
@@ -68,8 +111,11 @@ export class GrooveBoxEffects {
       this.nextNoteStartTime <
       this.audioContext.currentTime + LOOKAHEAD_IN_SECONDS
     ) {
-      Object.keys(this.patterns.byTrackId).map((trackId) =>
-        this.schedulePatternForTrack(trackId, secondsPerTick)
+      Object.keys(this.melodicPatterns.byTrackId).map((trackId) =>
+        this.scheduleMelodicPatternForTrack(trackId, secondsPerTick)
+      );
+      Object.keys(this.rhythmicPatterns.byTrackId).map((trackId) =>
+        this.scheduleRhythmicPatternForTrack(trackId, secondsPerTick)
       );
 
       this.nextNoteStartTime += secondsPerTick;
@@ -109,15 +155,17 @@ export class GrooveBoxEffects {
           of(action).pipe(
             withLatestFrom(
               this.store.select('grooveBox'),
+              this.store.select('melodicPatterns'),
               this.store.select('rhythmicPatterns'),
               this.store.select('tracks')
             )
           )
         ),
         tap((action) => {
-          this.patterns = action[2];
           this.tempo = action[1].tempo;
-          this.tracks = action[3];
+          this.melodicPatterns = action[2];
+          this.rhythmicPatterns = action[3];
+          this.tracks = action[4];
           this.toggle(action[1].isPlaying);
         })
       ),
@@ -128,6 +176,7 @@ export class GrooveBoxEffects {
     private actions$: Actions,
     private store: Store<{
       grooveBox: GrooveBoxState;
+      melodicPatterns: MelodicPatternsState;
       rhythmicPatterns: RhythmicPatternsState;
       tracks: TracksState;
     }>
