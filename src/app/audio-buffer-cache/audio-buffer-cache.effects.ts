@@ -5,7 +5,7 @@ import {
   ofType,
   ROOT_EFFECTS_INIT
 } from '@ngrx/effects';
-import { select, Store } from '@ngrx/store';
+import { Store } from '@ngrx/store';
 import { of } from 'rxjs';
 import { concatMap, tap, withLatestFrom } from 'rxjs/operators';
 import { selectSampleForTrack } from '../samples/samples.actions';
@@ -30,7 +30,7 @@ export class AudioBufferCacheEffects {
       this.actions$.pipe(
         ofType(ROOT_EFFECTS_INIT),
         concatMap((action) =>
-          of(action).pipe(withLatestFrom(this.store.pipe(select('samples'))))
+          of(action).pipe(withLatestFrom(this.store.select('samples')))
         ),
         tap((action) => {
           const samples = action[1];

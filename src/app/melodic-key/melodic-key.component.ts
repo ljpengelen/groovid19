@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { select, Store } from '@ngrx/store';
+import { Store } from '@ngrx/store';
 import { setValueForToneAtTickForTrack } from '../melodic-patterns/melodic-patterns.actions';
 import { MelodicPatternsState } from '../melodic-patterns/melodic-patterns.reducer';
 
@@ -23,7 +23,7 @@ export class MelodicKeyComponent {
 
   ngOnInit(): void {
     this.store
-      .pipe(select('melodicPatterns', 'byTrackId'))
+      .select('melodicPatterns', 'byTrackId')
       .subscribe((melodicPatterns) => {
         this.checked =
           melodicPatterns[this.trackId].pattern[this.tick][this.tone];

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect } from '@ngrx/effects';
-import { select, Store } from '@ngrx/store';
+import { Store } from '@ngrx/store';
 import { of } from 'rxjs';
 import { concatMap, tap, withLatestFrom } from 'rxjs/operators';
 import { audioBufferCache } from '../audio-buffer-cache/audio-buffer-cache';
@@ -108,9 +108,9 @@ export class GrooveBoxEffects {
         concatMap((action) =>
           of(action).pipe(
             withLatestFrom(
-              this.store.pipe(select('grooveBox')),
-              this.store.pipe(select('rhythmicPatterns')),
-              this.store.pipe(select('tracks'))
+              this.store.select('grooveBox'),
+              this.store.select('rhythmicPatterns'),
+              this.store.select('tracks')
             )
           )
         ),

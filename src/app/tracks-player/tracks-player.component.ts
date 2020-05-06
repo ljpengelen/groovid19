@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Store, select } from '@ngrx/store';
+import { Store } from '@ngrx/store';
 import { togglePlayAllTracks } from '../groove-box/groove-box.actions';
 
 @Component({
@@ -18,7 +18,7 @@ export class TracksPlayerComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.store.pipe(select('grooveBox', 'isPlaying')).subscribe((isPlaying) => {
+    this.store.select('grooveBox', 'isPlaying').subscribe((isPlaying) => {
       this.isPlaying = isPlaying;
     });
   }

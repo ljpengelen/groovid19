@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Store, select } from '@ngrx/store';
+import { Store } from '@ngrx/store';
 import { MelodicPattern } from '../melodic-patterns/melodic-patterns.reducer';
 
 @Component({
@@ -20,11 +20,9 @@ export class MelodicKeyPadComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.store
-      .pipe(select('melodicPatterns'), select('byTrackId'))
-      .subscribe((patterns) => {
-        const pattern = patterns[this.trackId].pattern;
-        this.ticks = [...pattern.keys()];
-      });
+    this.store.select('melodicPatterns', 'byTrackId').subscribe((patterns) => {
+      const pattern = patterns[this.trackId].pattern;
+      this.ticks = [...pattern.keys()];
+    });
   }
 }
