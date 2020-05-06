@@ -17,11 +17,13 @@ import { SampleSelectorComponent } from './sample-selector/sample-selector.compo
 import { GrooveBoxComponent } from './groove-box/groove-box.component';
 import { GrooveBoxEffects } from './groove-box/groove-box.effects';
 import { grooveBoxReducer } from './groove-box/groove-box.reducer';
-import { patternsReducer } from './patterns/patterns.reducer';
+import { MelodicKeyComponent } from './melodic-key/melodic-key.component';
+import { MelodicKeyPadComponent } from './melodic-key-pad/melodic-key-pad.component';
+import { rhythmicPatternsReducer } from './rhythmic-patterns/rhythmic-patterns.reducer';
 import { SamplePlayerComponent } from './sample-player/sample-player.component';
 import { samplesReducer } from './samples/samples.reducer';
 import { tracksReducer } from './tracks/tracks.reducer';
-import { KeyComponent } from './key/key.component';
+import { RhythmicKeyComponent } from './rhythmic-key/rhythmic-key.component';
 import { RhythmicKeyPadComponent } from './rhythmic-key-pad/rhythmic-key-pad.component';
 import { TrackCreatorComponent } from './track-creator/track-creator.component';
 import { TrackComponent } from './track/track.component';
@@ -29,10 +31,12 @@ import { TracksPlayerComponent } from './tracks-player/tracks-player.component';
 import { TempoSelectorComponent } from './tempo-selector/tempo-selector.component';
 import { TrackVolumeSelectorComponent } from './track-volume-selector/track-volume-selector.component';
 import { TrackSwingSelectorComponent } from './track-swing-selector/track-swing-selector.component';
+import { melodicPatternsReducer } from './melodic-patterns/melodic-patterns.reducer';
 
 const reducers: ActionReducerMap<any> = {
   grooveBox: grooveBoxReducer,
-  patterns: patternsReducer,
+  melodicPatterns: melodicPatternsReducer,
+  rhythmicPatterns: rhythmicPatternsReducer,
   samples: samplesReducer,
   tracks: tracksReducer
 };
@@ -51,9 +55,11 @@ const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
     AppComponent,
     SampleSelectorComponent,
     GrooveBoxComponent,
-    SamplePlayerComponent,
-    KeyComponent,
+    MelodicKeyPadComponent,
+    MelodicKeyComponent,
+    RhythmicKeyComponent,
     RhythmicKeyPadComponent,
+    SamplePlayerComponent,
     TrackCreatorComponent,
     TrackComponent,
     TracksPlayerComponent,

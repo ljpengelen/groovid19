@@ -1,0 +1,10 @@
+<div class="melodic-key-pad">
+  <div *ngFor="let tone of tones">
+    <app-melodic-key
+      *ngFor="let tick of ticks"
+      [tick]="tick"
+      [tone]="tone"
+      [trackId]="trackId"
+    ></app-melodic-key>
+  </div>
+</div>

@@ -1,20 +1,19 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { KeyComponent } from './key.component';
+import { RhythmicKeyComponent } from './rhythmic-key.component';
 
 describe('KeyComponent', () => {
-  let component: KeyComponent;
-  let fixture: ComponentFixture<KeyComponent>;
+  let component: RhythmicKeyComponent;
+  let fixture: ComponentFixture<RhythmicKeyComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ KeyComponent ]
-    })
-    .compileComponents();
+      declarations: [RhythmicKeyComponent]
+    }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(KeyComponent);
+    fixture = TestBed.createComponent(RhythmicKeyComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

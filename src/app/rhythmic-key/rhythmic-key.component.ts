@@ -1,14 +1,14 @@
 import { Component, Input } from '@angular/core';
-import { setValueAtTickForTrack } from '../patterns/patterns.actions';
-import { Pattern } from '../patterns/patterns.reducer';
-import { Store, select } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
+import { setValueAtTickForTrack } from '../rhythmic-patterns/rhythmic-patterns.actions';
+import { RhythmicPatternsState } from '../rhythmic-patterns/rhythmic-patterns.reducer';
 
 @Component({
-  selector: 'app-key',
-  templateUrl: './key.component.html',
-  styleUrls: ['./key.component.scss']
+  selector: 'app-rhythmic-key',
+  templateUrl: './rhythmic-key.component.html',
+  styleUrls: ['./rhythmic-key.component.scss']
 })
-export class KeyComponent {
+export class RhythmicKeyComponent {
   @Input() tick: number;
   @Input() trackId: string;
 
@@ -16,13 +16,13 @@ export class KeyComponent {
 
   constructor(
     private store: Store<{
-      patterns: { byTrackId: { [trackId: string]: Pattern } };
+      rhythmicPatterns: RhythmicPatternsState;
     }>
   ) {}
 
   ngOnInit(): void {
     this.store
-      .pipe(select('patterns'), select('byTrackId'))
+      .pipe(select('rhythmicPatterns', 'byTrackId'))
       .subscribe((patterns) => {
         this.checked = patterns[this.trackId].pattern[this.tick];
       });

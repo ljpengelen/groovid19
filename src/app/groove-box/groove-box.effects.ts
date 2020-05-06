@@ -1,13 +1,13 @@
-import { Actions, createEffect } from '@ngrx/effects';
-import { audioBufferCache } from '../audio-buffer-cache/audio-buffer-cache';
-import { concatMap, tap, withLatestFrom } from 'rxjs/operators';
-import { GainNodeCache } from '../gain-node-cache/gain-node-cache';
-import { GrooveBoxState } from './groove-box.reducer';
 import { Injectable } from '@angular/core';
+import { Actions, createEffect } from '@ngrx/effects';
+import { select, Store } from '@ngrx/store';
 import { of } from 'rxjs';
-import { PatternsState } from '../patterns/patterns.reducer';
-import { Store, select } from '@ngrx/store';
+import { concatMap, tap, withLatestFrom } from 'rxjs/operators';
+import { audioBufferCache } from '../audio-buffer-cache/audio-buffer-cache';
+import { GainNodeCache } from '../gain-node-cache/gain-node-cache';
+import { RhythmicPatternsState } from '../rhythmic-patterns/rhythmic-patterns.reducer';
 import { TracksState } from '../tracks/tracks.reducer';
+import { GrooveBoxState } from './groove-box.reducer';
 
 const LOOKAHEAD_IN_SECONDS = 0.1;
 const SCHEDULING_INTERVAL_IN_MS = 25;
@@ -15,7 +15,7 @@ const SCHEDULING_INTERVAL_IN_MS = 25;
 @Injectable()
 export class GrooveBoxEffects {
   private isPlaying = false;
-  private patterns: PatternsState;
+  private patterns: RhythmicPatternsState;
   private tempo: number;
   private tracks: TracksState;
 
@@ -109,7 +109,7 @@ export class GrooveBoxEffects {
           of(action).pipe(
             withLatestFrom(
               this.store.pipe(select('grooveBox')),
-              this.store.pipe(select('patterns')),
+              this.store.pipe(select('rhythmicPatterns')),
               this.store.pipe(select('tracks'))
             )
           )
@@ -128,7 +128,7 @@ export class GrooveBoxEffects {
     private actions$: Actions,
     private store: Store<{
       grooveBox: GrooveBoxState;
-      patterns: PatternsState;
+      rhythmicPatterns: RhythmicPatternsState;
       tracks: TracksState;
     }>
   ) {

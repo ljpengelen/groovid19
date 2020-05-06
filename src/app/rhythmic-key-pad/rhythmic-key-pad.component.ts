@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Pattern } from '../patterns/patterns.reducer';
-import { Store, select } from '@ngrx/store';
+import { Store } from '@ngrx/store';
+import { RhythmicPatternsState } from '../rhythmic-patterns/rhythmic-patterns.reducer';
 
 @Component({
   selector: 'app-rhythmic-key-pad',
@@ -14,16 +14,14 @@ export class RhythmicKeyPadComponent implements OnInit {
 
   constructor(
     private store: Store<{
-      patterns: { byTrackId: { [trackId: string]: Pattern } };
+      rhythmicPatterns: RhythmicPatternsState;
     }>
   ) {}
 
   ngOnInit() {
-    this.store
-      .pipe(select('patterns'), select('byTrackId'))
-      .subscribe((patterns) => {
-        const pattern = patterns[this.trackId].pattern;
-        this.ticks = [...pattern.keys()];
-      });
+    this.store.select('rhythmicPatterns', 'byTrackId').subscribe((patterns) => {
+      const pattern = patterns[this.trackId].pattern;
+      this.ticks = [...pattern.keys()];
+    });
   }
 }

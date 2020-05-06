@@ -1,16 +1,16 @@
+import { Injectable } from '@angular/core';
 import {
   Actions,
   createEffect,
   ofType,
   ROOT_EFFECTS_INIT
 } from '@ngrx/effects';
-import { audioBufferCache } from './audio-buffer-cache';
-import { concatMap, tap, withLatestFrom } from 'rxjs/operators';
-import { Injectable } from '@angular/core';
-import { of } from 'rxjs';
-import { SamplesState } from '../samples/samples.reducer';
-import { selectSampleForTrack } from '../samples/samples.actions';
 import { select, Store } from '@ngrx/store';
+import { of } from 'rxjs';
+import { concatMap, tap, withLatestFrom } from 'rxjs/operators';
+import { selectSampleForTrack } from '../samples/samples.actions';
+import { SamplesState } from '../samples/samples.reducer';
+import { audioBufferCache } from './audio-buffer-cache';
 
 @Injectable()
 export class AudioBufferCacheEffects {
@@ -34,12 +34,12 @@ export class AudioBufferCacheEffects {
         ),
         tap((action) => {
           const samples = action[1];
-          Object.keys(samples.byTrackId).map((trackId) =>
-            audioBufferCache.put(
-              trackId,
-              samples.byTrackId[trackId].encodedSample
-            )
-          );
+          Object.keys(samples.byTrackId).map((trackId) => {
+            const encodedSample = samples.byTrackId[trackId].encodedSample;
+            if (encodedSample) {
+              audioBufferCache.put(trackId, encodedSample);
+            }
+          });
         })
       ),
     { dispatch: false }

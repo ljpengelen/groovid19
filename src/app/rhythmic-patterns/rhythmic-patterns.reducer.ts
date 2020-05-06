@@ -1,14 +1,14 @@
 import { Action, createReducer, on } from '@ngrx/store';
 import { createTrack } from '../tracks/tracks.actions';
-import { setValueAtTickForTrack } from './patterns.actions';
+import { setValueAtTickForTrack } from './rhythmic-patterns.actions';
 
-export interface Pattern {
+export interface RhythmicPattern {
   pattern: boolean[];
 }
 
-export interface PatternsState {
+export interface RhythmicPatternsState {
   byTrackId: {
-    [trackId: string]: Pattern;
+    [trackId: string]: RhythmicPattern;
   };
 }
 
@@ -16,9 +16,9 @@ export const initialState = {
   byTrackId: {}
 };
 
-const _patternsReducer = createReducer(
+const _rhythmicPatternsReducer = createReducer(
   initialState,
-  on(createTrack, (state: PatternsState, { id }) => ({
+  on(createTrack, (state: RhythmicPatternsState, { id }) => ({
     ...state,
     byTrackId: {
       ...state.byTrackId,
@@ -27,7 +27,7 @@ const _patternsReducer = createReducer(
   })),
   on(
     setValueAtTickForTrack,
-    (state: PatternsState, { value, tick, trackId }) => ({
+    (state: RhythmicPatternsState, { value, tick, trackId }) => ({
       ...state,
       byTrackId: {
         ...state.byTrackId,
@@ -44,9 +44,9 @@ const _patternsReducer = createReducer(
   )
 );
 
-export function patternsReducer(
-  state: PatternsState | undefined,
+export function rhythmicPatternsReducer(
+  state: RhythmicPatternsState | undefined,
   action: Action
 ) {
-  return _patternsReducer(state, action);
+  return _rhythmicPatternsReducer(state, action);
 }
