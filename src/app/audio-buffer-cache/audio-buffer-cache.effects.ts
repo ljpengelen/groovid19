@@ -8,6 +8,7 @@ import {
 import { Store } from '@ngrx/store';
 import { of } from 'rxjs';
 import { concatMap, tap, withLatestFrom } from 'rxjs/operators';
+import { importState } from '../importer/importer.actions';
 import { selectSampleForTrack } from '../samples/samples.actions';
 import { SamplesState } from '../samples/samples.reducer';
 import { audioBufferCache } from './audio-buffer-cache';
@@ -28,7 +29,7 @@ export class AudioBufferCacheEffects {
   cacheAllSamples$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(ROOT_EFFECTS_INIT),
+        ofType(ROOT_EFFECTS_INIT, importState),
         concatMap((action) =>
           of(action).pipe(withLatestFrom(this.store.select('samples')))
         ),
