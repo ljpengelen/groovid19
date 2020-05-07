@@ -34,6 +34,7 @@ import { TrackSwingSelectorComponent } from './track-swing-selector/track-swing-
 import { melodicPatternsReducer } from './melodic-patterns/melodic-patterns.reducer';
 import { ScaleSelectorComponent } from './scale-selector/scale-selector.component';
 import { KeyPadTypeSelectorComponent } from './key-pad-type-selector/key-pad-type-selector.component';
+import { ExporterComponent } from './exporter/exporter.component';
 
 const reducers: ActionReducerMap<any> = {
   grooveBox: grooveBoxReducer,
@@ -69,7 +70,8 @@ const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
     TrackVolumeSelectorComponent,
     TrackSwingSelectorComponent,
     ScaleSelectorComponent,
-    KeyPadTypeSelectorComponent
+    KeyPadTypeSelectorComponent,
+    ExporterComponent
   ],
   imports: [
     BrowserModule,
