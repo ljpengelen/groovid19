@@ -38,6 +38,7 @@
     "ngrx-store-localstorage": "^9.0.0",
     "rxjs": "~6.5.4",
     "tslib": "^1.10.0",
+    "vertx3-eventbus-client": "^3.9.0",
     "zone.js": "~0.10.2"
   },
   "devDependencies": {
