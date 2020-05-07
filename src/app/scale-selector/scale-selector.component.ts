@@ -1,6 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { isNumber } from 'util';
 import { setScaleForTrack } from '../tracks/tracks.actions';
 import { Scale, TracksState } from '../tracks/tracks.reducer';
 
@@ -12,7 +11,7 @@ import { Scale, TracksState } from '../tracks/tracks.reducer';
 export class ScaleSelectorComponent implements OnInit {
   @Input() trackId: string;
 
-  scales = Object.values(Scale).filter(isNumber);
+  scales = Object.values(Scale).filter((value) => typeof value === 'number');
   selectedScale: Scale;
 
   constructor(
