@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
 import fileSaver from 'file-saver';
 
@@ -7,10 +7,8 @@ import fileSaver from 'file-saver';
   templateUrl: './exporter.component.html',
   styleUrls: ['./exporter.component.scss']
 })
-export class ExporterComponent implements OnInit {
+export class ExporterComponent {
   constructor(private store: Store) {}
-
-  ngOnInit(): void {}
 
   export() {
     this.store
