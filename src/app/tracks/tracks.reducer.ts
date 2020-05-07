@@ -1,6 +1,7 @@
 import { Action, createReducer, on } from '@ngrx/store';
 import {
   createTrack,
+  setKeyPadTypeForTrack,
   setNameForTrack,
   setScaleForTrack,
   setSwingForTrack,
@@ -14,8 +15,14 @@ export enum Scale {
   MelodicMinor
 }
 
+export enum KeyPadType {
+  Melodic,
+  Rhythmic
+}
+
 export interface Track {
   id: string;
+  keyPadType: KeyPadType;
   name: string;
   scale: Scale;
   swing: number;
@@ -36,7 +43,24 @@ const _tracksReducer = createReducer(
     ...state,
     byId: {
       ...state.byId,
-      [id]: { id, name: '', scale: Scale.Major, swing: 50, volume: 100 }
+      [id]: {
+        id,
+        name: '',
+        keyPadType: KeyPadType.Rhythmic,
+        scale: Scale.Major,
+        swing: 50,
+        volume: 100
+      }
+    }
+  })),
+  on(setKeyPadTypeForTrack, (state: TracksState, { keyPadType, trackId }) => ({
+    ...state,
+    byId: {
+      ...state.byId,
+      [trackId]: {
+        ...state.byId[trackId],
+        keyPadType
+      }
     }
   })),
   on(setNameForTrack, (state: TracksState, { name, trackId }) => ({

@@ -1,9 +1,14 @@
 import { createAction, props } from '@ngrx/store';
-import { Scale } from './tracks.reducer';
+import { KeyPadType, Scale } from './tracks.reducer';
 
 export const createTrack = createAction(
   '[Tracks] Create',
   props<{ id: string }>()
+);
+
+export const setKeyPadTypeForTrack = createAction(
+  '[Tracks] Set key-pad type for track',
+  props<{ keyPadType: KeyPadType; trackId: string }>()
 );
 
 export const setNameForTrack = createAction(

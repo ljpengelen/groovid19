@@ -1,0 +1,8 @@
+<select #select (change)="selectKeyPadType(select.value)">
+  <option
+    *ngFor="let type of types"
+    value="{{ type }}"
+    [selected]="type == selectedType"
+    >{{ toString[type] }}</option
+  >
+</select>
