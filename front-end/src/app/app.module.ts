@@ -35,6 +35,7 @@ import { TrackVolumeSelectorComponent } from './track-volume-selector/track-volu
 import { TrackComponent } from './track/track.component';
 import { TracksPlayerComponent } from './tracks-player/tracks-player.component';
 import { tracksReducer } from './tracks/tracks.reducer';
+import { SynchronizerComponent } from './synchronizer/synchronizer.component';
 
 const reducers: ActionReducerMap<any> = {
   grooveBox: grooveBoxReducer,
@@ -95,7 +96,8 @@ const metaReducers: Array<MetaReducer<any, any>> = [
     ScaleSelectorComponent,
     KeyPadTypeSelectorComponent,
     ExporterComponent,
-    ImporterComponent
+    ImporterComponent,
+    SynchronizerComponent
   ],
   imports: [
     BrowserModule,
