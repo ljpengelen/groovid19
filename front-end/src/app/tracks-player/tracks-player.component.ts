@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { togglePlayAllTracks } from '../groove-box/groove-box.actions';
+import { playAllTracks } from '../groove-box/groove-box.actions';
 
 @Component({
   selector: 'app-tracks-player',
@@ -24,6 +24,6 @@ export class TracksPlayerComponent implements OnInit {
   }
 
   toggle(): void {
-    this.store.dispatch(togglePlayAllTracks());
+    this.store.dispatch(playAllTracks({ shouldBePlaying: !this.isPlaying }));
   }
 }

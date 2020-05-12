@@ -5,6 +5,7 @@ export const setTempo = createAction(
   props<{ tempo: number }>()
 );
 
-export const togglePlayAllTracks = createAction(
-  '[Groove box] Toggle play all tracks'
+export const playAllTracks = createAction(
+  '[Groove box] Play all tracks',
+  props<{ shouldBePlaying: boolean }>()
 );
