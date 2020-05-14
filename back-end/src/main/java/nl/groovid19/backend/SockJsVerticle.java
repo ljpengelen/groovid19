@@ -11,15 +11,19 @@ import io.vertx.ext.web.handler.sockjs.SockJSHandler;
 
 public class SockJsVerticle extends AbstractVerticle {
 
-    public static final String INCOMING_ACTIONS_ADDRESS = "eventsFromClientsToServer";
-    public static final String OUTGOING_ACTIONS_ADDRESS = "eventsFromServerToClients";
-
     private static final Logger LOGGER = LogManager.getLogger();
+    private static final String CLIENTS_TO_CLIENTS_ADDRESS_REGEX = "clientsToClients\\..*";
+
+    private final Router router;
+
+    public SockJsVerticle(Router router) {
+        this.router = router;
+    }
 
     private Router sockJsRouter() {
         BridgeOptions bridgeOptions = new BridgeOptions()
-                .addInboundPermitted(new PermittedOptions().setAddress(INCOMING_ACTIONS_ADDRESS))
-                .addOutboundPermitted(new PermittedOptions().setAddress(OUTGOING_ACTIONS_ADDRESS));
+                .addInboundPermitted(new PermittedOptions().setAddressRegex(CLIENTS_TO_CLIENTS_ADDRESS_REGEX))
+                .addOutboundPermitted(new PermittedOptions().setAddressRegex(CLIENTS_TO_CLIENTS_ADDRESS_REGEX));
 
         SockJSHandler sockJSHandler = SockJSHandler.create(vertx);
 
@@ -28,22 +32,7 @@ public class SockJsVerticle extends AbstractVerticle {
 
     @Override
     public void start() {
-        Router router = Router.router(vertx);
-        router.route("/eventBus/*").handler(context -> {
-            LOGGER.info("Connecting to the event bus");
-
-            var token = context.request().getParam("token");
-            var tokenIsValid = true;
-            if (tokenIsValid) {
-                LOGGER.info("Successfully connected to the event bus");
-                context.next();
-            } else {
-                LOGGER.error("Invalid token '{}' used to connect to the event bus", token);
-                context.fail(401);
-            }
-        });
+        LOGGER.info("Starting SockJs verticle");
         router.mountSubRouter("/eventBus", sockJsRouter());
-
-        vertx.createHttpServer().requestHandler(router::handle).listen(3003);
     }
 }

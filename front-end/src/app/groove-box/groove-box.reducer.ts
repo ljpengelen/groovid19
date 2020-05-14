@@ -1,5 +1,9 @@
 import { Action, createReducer, on } from '@ngrx/store';
-import { playAllTracks, setTempo } from './groove-box.actions';
+import {
+  playAllTracks,
+  setIsSynchronizing,
+  setTempo
+} from './groove-box.actions';
 
 export interface GrooveBoxState {
   isPlaying: boolean;
@@ -15,9 +19,13 @@ export const initialState = {
 
 const _grooveBoxReducer = createReducer(
   initialState,
-  on(playAllTracks, (state: GrooveBoxState, { shouldBePlaying }) => ({
+  on(playAllTracks, (state: GrooveBoxState, { isPlaying }) => ({
     ...state,
-    isPlaying: shouldBePlaying
+    isPlaying
+  })),
+  on(setIsSynchronizing, (state: GrooveBoxState, { isSynchronizing }) => ({
+    ...state,
+    isSynchronizing
   })),
   on(setTempo, (state: GrooveBoxState, { tempo }) => ({
     ...state,

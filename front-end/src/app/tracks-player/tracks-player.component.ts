@@ -24,6 +24,6 @@ export class TracksPlayerComponent implements OnInit {
   }
 
   toggle(): void {
-    this.store.dispatch(playAllTracks({ shouldBePlaying: !this.isPlaying }));
+    this.store.dispatch(playAllTracks({ isPlaying: !this.isPlaying }));
   }
 }

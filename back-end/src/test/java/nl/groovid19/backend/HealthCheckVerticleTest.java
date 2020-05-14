@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.ext.web.Router;
 import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.junit5.VertxExtension;
@@ -31,7 +32,26 @@ public class HealthCheckVerticleTest {
         port = socket.getLocalPort();
         socket.close();
 
-        vertx.deployVerticle(new HealthCheckVerticle(port), vertxTestContext.completing());
+        var router = Router.router(vertx);
+        var httpServer = vertx.createHttpServer();
+        httpServer.requestHandler(router);
+
+        vertx.deployVerticle(new HealthCheckVerticle(router), deployResult -> {
+            if (deployResult.succeeded()) {
+                httpServer.listen(port, listenResult -> {
+                    if (listenResult.succeeded()) {
+                        var server = listenResult.result();
+                        LOGGER.info("HTTP server is listening on port {}", server.actualPort());
+                        vertxTestContext.completeNow();
+                    } else {
+                        LOGGER.error("HTTP server is unable to listen", listenResult.cause());
+                        vertxTestContext.failNow(listenResult.cause());
+                    }
+                });
+            } else {
+                vertxTestContext.failNow(deployResult.cause());
+            }
+        });
     }
 
     @Test

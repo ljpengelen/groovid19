@@ -3,30 +3,55 @@ package nl.groovid19.backend;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import io.vertx.core.Vertx;
-import io.vertx.core.VertxOptions;
+import io.vertx.core.*;
+import io.vertx.ext.web.Router;
 
 public class Application {
 
-    private static final Logger logger = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private Vertx vertx;
 
-    public static void main(String[] args) {
-        Application app = new Application();
-        app.start();
+    private Future<String> deployVerticle(Verticle verticle) {
+        Promise<String> promise = Promise.promise();
+        vertx.deployVerticle(verticle, promise);
+        return promise.future();
     }
 
     public void start() {
-        logger.info("Starting application");
+        LOGGER.info("Starting application");
 
         VertxOptions options = new VertxOptions();
         options.setHAEnabled(true);
         vertx = Vertx.vertx(options);
 
-        logger.info("Deploying verticles");
-        vertx.deployVerticle(new HealthCheckVerticle());
-        vertx.deployVerticle(new SockJsVerticle());
-        vertx.deployVerticle(new TestVerticle());
+        LOGGER.info("Deploying verticles");
+
+        var router = Router.router(vertx);
+        var httpServer = vertx.createHttpServer();
+        httpServer.requestHandler(router);
+
+        CompositeFuture.all(
+                deployVerticle(new HealthCheckVerticle(router)),
+                deployVerticle(new SockJsVerticle(router))).onComplete(deploymentResult -> {
+            if (deploymentResult.succeeded()) {
+                LOGGER.info("All verticles started successfully");
+                httpServer.listen(3003, ar -> {
+                    if (ar.succeeded()) {
+                        var server = ar.result();
+                        LOGGER.info("HTTP server is listening on port {}", server.actualPort());
+                    } else {
+                        LOGGER.error("HTTP server is unable to listen", ar.cause());
+                    }
+                });
+            } else {
+                LOGGER.error("Unable to deploy all verticles", deploymentResult.cause());
+            }
+        });
+    }
+
+    public static void main(String[] args) {
+        Application app = new Application();
+        app.start();
     }
 }

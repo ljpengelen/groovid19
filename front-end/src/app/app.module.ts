@@ -28,6 +28,8 @@ import { SamplePlayerComponent } from './sample-player/sample-player.component';
 import { SampleSelectorComponent } from './sample-selector/sample-selector.component';
 import { samplesReducer } from './samples/samples.reducer';
 import { ScaleSelectorComponent } from './scale-selector/scale-selector.component';
+import { SynchronizerComponent } from './synchronizer/synchronizer.component';
+import { SynchronizerEffects } from './synchronizer/synchronizer.effects';
 import { TempoSelectorComponent } from './tempo-selector/tempo-selector.component';
 import { TrackCreatorComponent } from './track-creator/track-creator.component';
 import { TrackSwingSelectorComponent } from './track-swing-selector/track-swing-selector.component';
@@ -35,7 +37,6 @@ import { TrackVolumeSelectorComponent } from './track-volume-selector/track-volu
 import { TrackComponent } from './track/track.component';
 import { TracksPlayerComponent } from './tracks-player/tracks-player.component';
 import { tracksReducer } from './tracks/tracks.reducer';
-import { SynchronizerComponent } from './synchronizer/synchronizer.component';
 
 const reducers: ActionReducerMap<any> = {
   grooveBox: grooveBoxReducer,
@@ -63,7 +64,8 @@ export function importMetaReducer(
         ...stateToImport,
         grooveBox: {
           ...stateToImport.grooveBox,
-          isPlaying: false
+          isPlaying: false,
+          isSynchronizing: false
         }
       };
       return reducer(nextState, action);
@@ -103,7 +105,11 @@ const metaReducers: Array<MetaReducer<any, any>> = [
     BrowserModule,
     AppRoutingModule,
     StoreModule.forRoot(reducers, { metaReducers }),
-    EffectsModule.forRoot([AudioBufferCacheEffects, GrooveBoxEffects])
+    EffectsModule.forRoot([
+      AudioBufferCacheEffects,
+      GrooveBoxEffects,
+      SynchronizerEffects
+    ])
   ],
   providers: [],
   bootstrap: [AppComponent]
