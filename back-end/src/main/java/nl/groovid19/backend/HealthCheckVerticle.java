@@ -53,10 +53,11 @@ public class HealthCheckVerticle extends AbstractVerticle {
                 .put("version", version)
                 .toString();
 
-        router.route(HttpMethod.GET, "/health").handler(request -> {
-            var response = request.response();
+        router.route(HttpMethod.GET, "/health").handler(routingContext -> {
+            var response = routingContext.response();
             response.putHeader("content-type", "application/json");
             response.end(responseBody);
+            routingContext.next();
         });
     }
 }

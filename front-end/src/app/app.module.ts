@@ -1,3 +1,4 @@
+import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { EffectsModule } from '@ngrx/effects';
@@ -58,7 +59,7 @@ export function importMetaReducer(
   reducer: ActionReducer<any>
 ): ActionReducer<any> {
   return function (state, action) {
-    if (action.type == importState.type) {
+    if (action.type === importState.type) {
       const stateToImport = (action as any).state;
       const nextState = {
         ...stateToImport,
@@ -103,6 +104,7 @@ const metaReducers: Array<MetaReducer<any, any>> = [
   ],
   imports: [
     BrowserModule,
+    HttpClientModule,
     AppRoutingModule,
     StoreModule.forRoot(reducers, { metaReducers }),
     EffectsModule.forRoot([

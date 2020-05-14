@@ -33,7 +33,8 @@ public class Application {
 
         CompositeFuture.all(
                 deployVerticle(new HealthCheckVerticle(router)),
-                deployVerticle(new SockJsVerticle(router))).onComplete(deploymentResult -> {
+                deployVerticle(new SockJsVerticle(router)),
+                deployVerticle(new ActionStoreVerticle(router))).onComplete(deploymentResult -> {
             if (deploymentResult.succeeded()) {
                 LOGGER.info("All verticles started successfully");
                 httpServer.listen(3003, ar -> {

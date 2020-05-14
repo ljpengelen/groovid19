@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import {
   Actions,
@@ -16,6 +17,7 @@ import {
   stopSynchronizing
 } from '../groove-box/groove-box.actions';
 import { GrooveBoxState } from '../groove-box/groove-box.reducer';
+import { selectSampleForTrack } from '../samples/samples.actions';
 
 @Injectable()
 export class SynchronizerEffects {
@@ -45,12 +47,25 @@ export class SynchronizerEffects {
               return;
             }
 
-            const action = {
-              ...message.body.action,
-              isExternal: true
-            };
-            console.log('Received external action', action);
-            subscriber.next(action);
+            if (message.body.actionUrl) {
+              this.http
+                .get(message.body.actionUrl)
+                .subscribe((externalAction) => {
+                  const action = {
+                    ...externalAction,
+                    isExternal: true
+                  };
+                  console.log('Received external action via http', action);
+                  subscriber.next(action as any);
+                });
+            } else {
+              const action = {
+                ...message.body.action,
+                isExternal: true
+              };
+              console.log('Received external action via web socket', action);
+              subscriber.next(action);
+            }
           }
         );
 
@@ -112,12 +127,27 @@ export class SynchronizerEffects {
       this.actions$.pipe(
         tap((action) => {
           if (this.isConnected && !(action as any).isExternal) {
-            console.log('Forwarding', action);
-            this.eventBus.publish(
-              'clientsToClients.abc',
-              { sender: this.id, action },
-              {}
-            );
+            if (action.type === selectSampleForTrack.type) {
+              console.log('Forwarding action via http', action);
+              this.http
+                .post('http://localhost:3003/action/', action, {
+                  responseType: 'text'
+                })
+                .subscribe((response) => {
+                  console.log('Received result of http forward', response);
+                  this.eventBus.publish('clientsToClients.abc', {
+                    sender: this.id,
+                    actionUrl: `http://localhost:3003/action/${response}`
+                  });
+                });
+            } else {
+              console.log('Forwarding action via event bus', action);
+              this.eventBus.publish(
+                'clientsToClients.abc',
+                { sender: this.id, action },
+                {}
+              );
+            }
           }
         })
       ),
@@ -126,6 +156,7 @@ export class SynchronizerEffects {
 
   constructor(
     private actions$: Actions,
+    private http: HttpClient,
     private store: Store<{
       grooveBox: GrooveBoxState;
     }>
