@@ -3,18 +3,27 @@
   <head>
     <meta charset="utf-8" />
     <title>Kick, snare, and hi-hat</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="graphs.js"></script>
   </head>
   <body>
-    <button id="kick">Play kick</button>
-    <button id="snare">Play snare</button>
-    <button id="hi-hat">Play hi-hat</button>
-    <canvas id="canvas" width="500" height="500"></canvas>
+    <div class="graphs">
+      <canvas id="time-canvas" width="500" height="500"></canvas>
+      <canvas id="frequency-canvas" width="500" height="500"></canvas>
+    </div>
+    <div class="controls">
+      <button id="kick">Play kick (q)</button>
+      <button id="snare">Play snare (w)</button>
+      <button id="hi-hat">Play hi-hat (e)</button>
+    </div>
     <script>
       const audioContextClass = window.AudioContext || window.webkitAudioContext;
       const audioContext = new audioContextClass();
 
-      const canvas = document.getElementById('canvas');
-      const canvasContext = canvas.getContext('2d');
+      const timeCanvas = document.getElementById('time-canvas');
+      const timeCanvasContext = timeCanvas.getContext('2d');
+      const frequencyCanvas = document.getElementById('frequency-canvas');
+      const frequencyCanvasContext = frequencyCanvas.getContext('2d');
       const WIDTH = 500;
       const HEIGHT = 500;
 
@@ -22,33 +31,8 @@
       analyser.fftSize = 1024 * 4;
 
       const draw = () => {
-        var bufferLength = analyser.frequencyBinCount;
-        var dataArray = new Uint8Array(bufferLength);
-        analyser.getByteTimeDomainData(dataArray);
-
-        canvasContext.fillStyle = 'white';
-        canvasContext.fillRect(0, 0, WIDTH, HEIGHT);
-        canvasContext.lineWidth = 2;
-        canvasContext.strokeStyle = 'black';
-        canvasContext.beginPath();
-        var sliceWidth = WIDTH * 1.0 / bufferLength;
-        var x = 0;
-
-        for (var i = 0; i < bufferLength; i++) {
-          var v = dataArray[i] / 128.0;
-          var y = v * HEIGHT/2;
-
-          if (i === 0) {
-            canvasContext.moveTo(x, y);
-          } else {
-            canvasContext.lineTo(x, y);
-          }
-
-          x += sliceWidth;
-        }
-
-        canvasContext.lineTo(canvas.width, canvas.height/2);
-        canvasContext.stroke();
+        drawTimeDomainData(timeCanvasContext, timeCanvas.width, timeCanvas.height);
+        drawFrequencyData(frequencyCanvasContext, frequencyCanvas.width, frequencyCanvas.height);
 
         requestAnimationFrame(draw);
       }
@@ -61,7 +45,7 @@
         const deg = Math.PI / 180;
         for (let i = 0; i < numberOfSamples; ++i) {
             const x = i * 2 / numberOfSamples - 1;
-            curve[i] = ( 3 + amount ) * x * 20 * deg / ( Math.PI + amount * Math.abs(x) );
+            curve[i] = (3 + amount) * x * 20 * deg / ( Math.PI + amount * Math.abs(x) );
         }
         return curve;
       };
@@ -88,44 +72,41 @@
       }
 
       const playKick = () => {
-        const saw = audioContext.createOscillator();
-        saw.type = 'triangle';
-        saw.frequency.value = 220;
-        saw.frequency.exponentialRampToValueAtTime(55, audioContext.currentTime + 0.1);
+        const triangle = audioContext.createOscillator();
+        triangle.type = 'triangle';
+        triangle.frequency.value = 220;
+        triangle.frequency.exponentialRampToValueAtTime(55, audioContext.currentTime + 0.1);
 
         const noise = whiteNoiseBufferSource();
 
         const waveShaper = audioContext.createWaveShaper();
-        waveShaper.curve = distortionCurve(10);
+        waveShaper.curve = distortionCurve(5);
 
-        const sawGainNode = audioContext.createGain();
-        sawGainNode.gain.value = 0;
-        sawGainNode.gain.linearRampToValueAtTime(1, audioContext.currentTime)
-        sawGainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.6)
+        const triangleGainNode = audioContext.createGain();
+        triangleGainNode.gain.value = 1;
+        triangleGainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.6)
 
-        saw.connect(waveShaper);
-        waveShaper.connect(sawGainNode);
-        sawGainNode.connect(audioContext.destination);
+        triangle.connect(waveShaper);
+        waveShaper.connect(triangleGainNode);
+        triangleGainNode.connect(audioContext.destination);
 
         const noiseGainNode = audioContext.createGain();
-        noiseGainNode.gain.value = 0;
-        noiseGainNode.gain.linearRampToValueAtTime(1, audioContext.currentTime + 0.000001);
+        noiseGainNode.gain.value = 1;
         noiseGainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.2);
 
         const noiseFilter = audioContext.createBiquadFilter();
         noiseFilter.type = 'lowpass';
         noiseFilter.frequency.value = 120;
-        noiseFilter.Q.value = -1;
 
         noise.connect(noiseGainNode);
         noiseGainNode.connect(noiseFilter);
         noiseFilter.connect(audioContext.destination);
 
-        sawGainNode.connect(analyser);
+        triangleGainNode.connect(analyser);
         noiseFilter.connect(analyser);
 
-        saw.start(audioContext.currentTime);
-        saw.stop(audioContext.currentTime + 1);
+        triangle.start(audioContext.currentTime);
+        triangle.stop(audioContext.currentTime + 1);
 
         noise.start(audioContext.currentTime);
         noise.stop(audioContext.currentTime + 1);
@@ -135,15 +116,13 @@
       kickButton.onclick = playKick;
 
       const playSnare = () => {
-        const lowSaw = audioContext.createOscillator();
-        lowSaw.type = 'triangle';
-        lowSaw.frequency.value = 185;
-        lowSaw.frequency.exponentialRampToValueAtTime(185, audioContext.currentTime + 0.2);
+        const lowTriangle = audioContext.createOscillator();
+        lowTriangle.type = 'triangle';
+        lowTriangle.frequency.value = 185;
 
-        const highSaw = audioContext.createOscillator();
-        highSaw.type = 'triangle';
-        highSaw.frequency.value = 349;
-        highSaw.frequency.exponentialRampToValueAtTime(349, audioContext.currentTime + 0.2);
+        const highTriangle = audioContext.createOscillator();
+        highTriangle.type = 'triangle';
+        highTriangle.frequency.value = 349;
 
         const noise = whiteNoiseBufferSource();
 
@@ -153,37 +132,33 @@
         const highWaveShaper = audioContext.createWaveShaper();
         highWaveShaper.curve = distortionCurve(5);
 
-        const lowSawGainNode = audioContext.createGain();
-        lowSawGainNode.gain.value = 0;
-        lowSawGainNode.gain.linearRampToValueAtTime(1, audioContext.currentTime)
-        lowSawGainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.1)
+        const lowTriangleGainNode = audioContext.createGain();
+        lowTriangleGainNode.gain.value = 1;
+        lowTriangleGainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.1)
 
-        const highSawGainNode = audioContext.createGain();
-        highSawGainNode.gain.value = 0;
-        highSawGainNode.gain.linearRampToValueAtTime(1, audioContext.currentTime)
-        highSawGainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.1)
+        const highTriangleGainNode = audioContext.createGain();
+        highTriangleGainNode.gain.value = 1;
+        highTriangleGainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.1)
 
         const snareGainNode = audioContext.createGain();
         snareGainNode.gain.value = 0.5;
 
-        lowSaw.connect(lowWaveShaper);
-        lowWaveShaper.connect(lowSawGainNode);
-        lowSawGainNode.connect(snareGainNode);
+        lowTriangle.connect(lowWaveShaper);
+        lowWaveShaper.connect(lowTriangleGainNode);
+        lowTriangleGainNode.connect(snareGainNode);
         snareGainNode.connect(audioContext.destination);
 
-        highSaw.connect(highWaveShaper);
-        highWaveShaper.connect(highSawGainNode);
-        highSawGainNode.connect(snareGainNode);
+        highTriangle.connect(highWaveShaper);
+        highWaveShaper.connect(highTriangleGainNode);
+        highTriangleGainNode.connect(snareGainNode);
 
         const noiseGainNode = audioContext.createGain();
-        noiseGainNode.gain.value = 0;
-        noiseGainNode.gain.linearRampToValueAtTime(1, audioContext.currentTime + 0.000001);
+        noiseGainNode.gain.value = 1;
         noiseGainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.2);
 
         const noiseFilter = audioContext.createBiquadFilter();
         noiseFilter.type = 'highpass';
         noiseFilter.frequency.value = 2000;
-        noiseFilter.Q.value = -1;
 
         noise.connect(noiseGainNode);
         noiseGainNode.connect(noiseFilter);
@@ -191,14 +166,14 @@
 
         snareGainNode.connect(analyser);
 
-        lowSaw.start(audioContext.currentTime);
-        lowSaw.stop(audioContext.currentTime + 0.5);
+        lowTriangle.start(audioContext.currentTime);
+        lowTriangle.stop(audioContext.currentTime + 1);
 
-        highSaw.start(audioContext.currentTime);
-        highSaw.stop(audioContext.currentTime + 0.5);
+        highTriangle.start(audioContext.currentTime);
+        highTriangle.stop(audioContext.currentTime + 1);
 
         noise.start(audioContext.currentTime);
-        noise.stop(audioContext.currentTime + 0.5);
+        noise.stop(audioContext.currentTime + 1);
       };
 
       const snareButton = document.getElementById('snare');
@@ -208,14 +183,13 @@
         const noise = whiteNoiseBufferSource();
 
         const noiseGainNode = audioContext.createGain();
-        noiseGainNode.gain.exponentialRampToValueAtTime(1, audioContext.currentTime);
+        noiseGainNode.gain.value = 1;
         noiseGainNode.gain.setValueAtTime(1, audioContext.currentTime + 0.001);
         noiseGainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.1);
 
         const noiseFilter = audioContext.createBiquadFilter();
         noiseFilter.type = 'highpass';
         noiseFilter.frequency.value = 2000;
-        noiseFilter.Q.value = 1;
 
         const hiHatGainNode = audioContext.createGain();
         hiHatGainNode.gain.value = 0.3;
@@ -228,7 +202,7 @@
         hiHatGainNode.connect(analyser)
 
         noise.start(audioContext.currentTime);
-        noise.stop(audioContext.currentTime + 5);
+        noise.stop(audioContext.currentTime + 1);
       };
 
       const hiHatButton = document.getElementById('hi-hat');

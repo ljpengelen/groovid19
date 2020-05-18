@@ -1,0 +1,10 @@
+.controls {
+    margin: 0 auto;
+    width: 1000px;
+}
+
+.graphs {
+    display: flex;
+    margin: 0 auto;
+    width: 1000px;
+}
