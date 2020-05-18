@@ -1,4 +1,4 @@
-# GrooveId19 - Back end
+# GroovId19 - Back end
 
 ## Prerequisites
 
