@@ -212,7 +212,7 @@ If you want to achieve more of a 90s Euro house vibe, you can drop down from a h
 
 ## White noise
 
-If you look at how classic synthesizers emulate kick drums, you'll see that they'll often use a little white noise to give the kicks a little more body.
+If you look at [how classic synthesizers emulate kick drums](https://www.soundonsound.com/techniques/practical-bass-drum-synthesis), you'll see that they'll often use a little white noise to give the kicks a little more body.
 The Web Audio API doesn't provide (white) noise out of the box, but you can use an audio buffer to [create your own](https://noisehack.com/generate-noise-web-audio-api/).
 
 ```js
