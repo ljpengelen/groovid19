@@ -75,7 +75,7 @@ It's also clear that there's much more going on in the spectrum graph.
 
 Unfortunately, it sounds a little abrasive, like this:
 
-<audio controls src="audio/sine-55Hz.mp3"></audio>
+<audio controls src="audio/triangle-55Hz.mp3"></audio>
 
 Ideally, we'd like to process this triangle wave in such a way that it sounds more like the sine wave, without cutting off too much of the high-frequency sounds.
 We can do that using a [wave shaper](https://developer.mozilla.org/en-US/docs/Web/API/WaveShaperNode).
@@ -277,7 +277,7 @@ const play = () => {
 
 The end result sounds like this:
 
-<audio controls src="audio/white-low-pass.mp3"></audio>
+<audio controls src="audio/white-noise-low-pass.mp3"></audio>
 
 ## End result
 
