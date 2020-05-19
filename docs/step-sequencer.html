@@ -178,11 +178,13 @@
 
       const kickSteps = new Array(32).fill(false);
       [0, 7, 10, 14, 16, 23, 26].forEach(index => kickSteps[index] = true);
+
       const snareSteps = new Array(32).fill(false);
       for (let i = 4; i < 32; i += 8) {
         snareSteps[i] = true;
       }
       snareSteps[31] = true;
+
       const hiHatSteps = new Array(32).fill(false);
       for (let i = 2; i < 32; i += 4) {
         hiHatSteps[i] = true;
