@@ -63,7 +63,7 @@ Together, these two sound like this:
 
 We could have used pure sines waves here.
 There's no need for applying the trick we used for the kick drum.
-What you're witnessing here is a sheer waste of processing power due to my unwillingness to refactor my code.
+What you're witnessing here is a sheer waste of processing power due to my unwillingness to refactor this code right now.
 Let's just say that I like the slightly more metallic sound of the distorted traingle waves.
 
 We'll use white noise again to represent the second component.
