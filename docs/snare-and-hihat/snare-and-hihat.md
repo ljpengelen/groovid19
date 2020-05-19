@@ -9,6 +9,9 @@ Once you know how to synthesize kicks, snares and hi-hats are not far away.
 The snare sound we'll synthesize consists of two components.
 One component represents the vibrating skins of the snare drum, the other represents the vibrating snares.
 For the first component, we'll use two sine-like waves, one at 185Hz and the other at 349Hz.
+I took these values from a [MusicTech tutorial](https://www.musictech.net/tutorials/modular-eurorack-snare-tutorial/).
+An [article in Sound on Sound](https://www.soundonsound.com/techniques/practical-snare-drum-synthesis) mentions 180Hz and 330Hz.
+Obviously, you should go with whatever frequencies sound best to you.
 
 ```js
 const playSnare = () => {
