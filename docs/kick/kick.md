@@ -37,7 +37,7 @@ The left-hand side of the figure shows the waveform, and the right-hand side sho
 The sound spectrum is almost completely empty, except for a narrow spike at the rightmost end.
 This explains why you might not hear the sound over your laptop speakers, for example.
 Not all speakers are capable of reproducing sounds at low frequencies.
-You can emulate the frequency response of such speakers by applying a high-pass filter.
+You can emulate the frequency response of such speakers by applying a [high-pass filter](https://en.wikipedia.org/wiki/High-pass_filter).
 If you filter out all frequencies below 120Hz, this is what's left of our sine wave:
 
 <audio controls src="audio/sine-55Hz-high-pass-120Hz.mp3"></audio>
