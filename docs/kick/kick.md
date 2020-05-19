@@ -25,7 +25,7 @@ const play = () => {
 ```
 
 It sounds like this:
-(You might not hear it without head phones.)
+(You might not hear it over your laptop's speakers. You'll need decent speakers or headphones that are able to reproduce low frequencies.)
 
 <audio controls src="audio/sine-55Hz.mp3"></audio>
 
