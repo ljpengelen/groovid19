@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Step sequencer</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div class="steps-container">
+      <div id="kick-steps" class="steps">
+        <span>Kick: </span>
+      </div>
+      <div id="snare-steps" class="steps">
+        <span>Snare: </span>
+      </div>
+      <div id="hi-hat-steps" class="steps">
+        <span>Hi-hat: </span>
+      </div>
+    </div>
+    <button id="play">Play/Stop</button>
+    <template id="step-template">
+      <input type="checkbox">
+    </template>
+    <script>
+      const audioContextClass = window.AudioContext || window.webkitAudioContext;
+      const audioContext = new audioContextClass();
+
+      const generateDistortionCurve = (amount) => {
+        const numberOfSamples = 44100;
+        const curve = new Float32Array(numberOfSamples);
+        const deg = Math.PI / 180;
+        for (let i = 0; i < numberOfSamples; ++i) {
+            const x = i * 2 / numberOfSamples - 1;
+            curve[i] = (3 + amount) * x * 20 * deg / ( Math.PI + amount * Math.abs(x) );
+        }
+        return curve;
+      };
+
+      const distortionCurve = generateDistortionCurve(5);
+
+      const distortionWaveShaper = () => {
+        const waveShaper = audioContext.createWaveShaper();
+        waveShaper.curve = distortionCurve;
+        return waveShaper;
+      }
+
+      const generateWhiteNoiseBuffer = (numberOfSamples) => {
+        const buffer = audioContext.createBuffer(1, numberOfSamples, audioContext.sampleRate);
+
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < numberOfSamples; ++i) {
+          data[i] = Math.random() * 2 - 1;
+        }
+
+        return buffer;
+      }
+
+      const whiteNoiseBuffer = generateWhiteNoiseBuffer(audioContext.sampleRate);
+
+      const whiteNoiseBufferSource = () => {
+        const bufferSource = audioContext.createBufferSource();
+        bufferSource.buffer = whiteNoiseBuffer;
+        bufferSource.loop = true;
+        bufferSource.loopEnd = audioContext.sampleRate
+        return bufferSource;
+      }
+
+      const scheduleKick = (startTime) => {
+        const triangle = audioContext.createOscillator();
+        triangle.type = 'triangle';
+        triangle.frequency.value = 220;
+        triangle.frequency.exponentialRampToValueAtTime(55, startTime + 0.1);
+
+        const noise = whiteNoiseBufferSource();
+        const waveShaper = distortionWaveShaper();
+
+        const triangleGainNode = audioContext.createGain();
+        triangleGainNode.gain.value = 1;
+        triangleGainNode.gain.linearRampToValueAtTime(0, startTime + 0.6)
+
+        triangle.connect(waveShaper);
+        waveShaper.connect(triangleGainNode);
+        triangleGainNode.connect(audioContext.destination);
+
+        const noiseGainNode = audioContext.createGain();
+        noiseGainNode.gain.value = 1;
+        noiseGainNode.gain.linearRampToValueAtTime(0, startTime + 0.2);
+
+        const noiseFilter = audioContext.createBiquadFilter();
+        noiseFilter.type = 'lowpass';
+        noiseFilter.frequency.value = 120;
+
+        noise.connect(noiseGainNode);
+        noiseGainNode.connect(noiseFilter);
+        noiseFilter.connect(audioContext.destination);
+
+        triangle.start(startTime);
+        triangle.stop(startTime + 0.6);
+
+        noise.start(startTime);
+        noise.stop(startTime + 0.6);
+      };
+
+      const scheduleSnare = (startTime) => {
+        const low = audioContext.createOscillator();
+        low.type = 'sine';
+        low.frequency.value = 185;
+
+        const high = audioContext.createOscillator();
+        high.type = 'sine';
+        high.frequency.value = 349;
+
+        const noise = whiteNoiseBufferSource();
+
+        const lowGainNode = audioContext.createGain();
+        lowGainNode.gain.value = 1;
+        lowGainNode.gain.linearRampToValueAtTime(0, startTime + 0.1)
+
+        const highGainNode = audioContext.createGain();
+        highGainNode.gain.value = 1;
+        highGainNode.gain.linearRampToValueAtTime(0, startTime + 0.1)
+
+        const snareGainNode = audioContext.createGain();
+        snareGainNode.gain.value = 0.5;
+
+        low.connect(lowGainNode);
+        lowGainNode.connect(snareGainNode);
+        snareGainNode.connect(audioContext.destination);
+
+        high.connect(highGainNode);
+        highGainNode.connect(snareGainNode);
+
+        const noiseGainNode = audioContext.createGain();
+        noiseGainNode.gain.value = 1;
+        noiseGainNode.gain.linearRampToValueAtTime(0, startTime + 0.2);
+
+        const noiseFilter = audioContext.createBiquadFilter();
+        noiseFilter.type = 'highpass';
+        noiseFilter.frequency.value = 2000;
+
+        noise.connect(noiseGainNode);
+        noiseGainNode.connect(noiseFilter);
+        noiseFilter.connect(snareGainNode);
+
+        low.start(startTime);
+        low.stop(startTime + 0.2);
+
+        high.start(startTime);
+        high.stop(startTime + 0.2);
+
+        noise.start(startTime);
+        noise.stop(startTime + 0.2);
+      };
+
+      const scheduleHiHat = (startTime) => {
+        const noise = whiteNoiseBufferSource();
+
+        const noiseGainNode = audioContext.createGain();
+        noiseGainNode.gain.value = 1;
+        noiseGainNode.gain.setValueAtTime(1, startTime + 0.001);
+        noiseGainNode.gain.linearRampToValueAtTime(0, startTime + 0.1);
+
+        const noiseFilter = audioContext.createBiquadFilter();
+        noiseFilter.type = 'highpass';
+        noiseFilter.frequency.value = 2000;
+
+        const hiHatGainNode = audioContext.createGain();
+        hiHatGainNode.gain.value = 0.3;
+
+        noise.connect(noiseGainNode);
+        noiseGainNode.connect(noiseFilter);
+        noiseFilter.connect(hiHatGainNode);
+        hiHatGainNode.connect(audioContext.destination);
+
+        noise.start(startTime);
+        noise.stop(startTime + 0.1);
+      };
+
+      const kickSteps = new Array(32).fill(false);
+      [0, 7, 10, 14, 16, 23, 26].forEach(index => kickSteps[index] = true);
+      const snareSteps = new Array(32).fill(false);
+      for (let i = 4; i < 32; i += 8) {
+        snareSteps[i] = true;
+      }
+      snareSteps[31] = true;
+      const hiHatSteps = new Array(32).fill(false);
+      for (let i = 2; i < 32; i += 4) {
+        hiHatSteps[i] = true;
+      }
+      [11, 17, 29].forEach(index => hiHatSteps[index] = true);
+
+      let timerId;
+      let isPlaying = false;
+      let nextNoteStartTime = 0;
+      let currentTick = 0;
+
+      const tempo = 120;
+
+      const SCHEDULING_INTERVAL_IN_MS = 25;
+      const LOOKAHEAD_IN_SECONDS = 0.1;
+
+      const play = () => {
+        isPlaying = true;
+
+        const secondsPerTick = 60 / 120 / 4;
+
+        while (
+          nextNoteStartTime <
+          audioContext.currentTime + LOOKAHEAD_IN_SECONDS
+        ) {
+          if (kickSteps[currentTick]) {
+            scheduleKick(nextNoteStartTime);
+          }
+          if (snareSteps[currentTick]) {
+            scheduleSnare(nextNoteStartTime);
+          }
+          if (hiHatSteps[currentTick]) {
+            scheduleHiHat(nextNoteStartTime);
+          }
+
+          nextNoteStartTime += secondsPerTick;
+
+          ++currentTick;
+          if (currentTick === 32) {
+            currentTick = 0;
+          }
+        }
+
+
+        timerId = setTimeout(play, SCHEDULING_INTERVAL_IN_MS);
+      }
+
+      const kickStepsElement = document.getElementById('kick-steps');
+      const snareStepsElement = document.getElementById('snare-steps');
+      const hiHatStepsElement = document.getElementById('hi-hat-steps');
+
+      [[kickStepsElement, kickSteps], [snareStepsElement, snareSteps], [hiHatStepsElement, hiHatSteps]].forEach(([ element, steps ]) => {
+        for (let i = 0; i < 32; ++i) {
+          const clone = document.getElementById("step-template").content.cloneNode(true);
+          clone.firstElementChild.setAttribute("data-step", i);
+          if (i % 4 == 3) {
+            clone.firstElementChild.classList.add("wide")
+          }
+          if (steps[i]) {
+            clone.firstElementChild.checked = true;
+          }
+          element.appendChild(clone);
+        };
+
+        element.onchange = e => {
+        const index = e.target.getAttribute("data-step");
+        steps[index] = !steps[index];
+      }});
+
+      document.getElementById('play').onclick = () => {
+        if (isPlaying) {
+          clearInterval(timerId);
+          isPlaying = false;
+        } else {
+          currentTick = 0;
+          nextNoteStartTime = audioContext.currentTime;
+          play();
+        }
+      }
+    </script>
+  </body>
+</html>

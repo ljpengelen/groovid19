@@ -8,3 +8,12 @@
     margin: 0 auto;
     width: 1000px;
 }
+
+.steps span {
+    display: inline-block;
+    width: 4rem;
+}
+
+input.wide {
+    margin-right: 1rem;
+}
