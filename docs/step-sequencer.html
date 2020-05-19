@@ -192,7 +192,6 @@
       [11, 17, 29].forEach(index => hiHatSteps[index] = true);
 
       let timerId;
-      let isPlaying = false;
       let nextNoteStartTime = 0;
       let currentTick = 0;
 
@@ -202,9 +201,7 @@
       const LOOKAHEAD_IN_SECONDS = 0.1;
 
       const play = () => {
-        isPlaying = true;
-
-        const secondsPerTick = 60 / 120 / 4;
+        const secondsPerTick = 60 / tempo / 4;
 
         while (
           nextNoteStartTime <
@@ -227,7 +224,6 @@
             currentTick = 0;
           }
         }
-
 
         timerId = setTimeout(play, SCHEDULING_INTERVAL_IN_MS);
       }
@@ -254,6 +250,8 @@
         steps[index] = !steps[index];
       }});
 
+      let isPlaying = false;
+
       document.getElementById('play').onclick = () => {
         if (isPlaying) {
           clearInterval(timerId);
@@ -262,6 +260,7 @@
           currentTick = 0;
           nextNoteStartTime = audioContext.currentTime;
           play();
+          isPlaying = true;
         }
       }
     </script>
