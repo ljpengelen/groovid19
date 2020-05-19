@@ -24,8 +24,6 @@
       const timeCanvasContext = timeCanvas.getContext('2d');
       const frequencyCanvas = document.getElementById('frequency-canvas');
       const frequencyCanvasContext = frequencyCanvas.getContext('2d');
-      const WIDTH = 500;
-      const HEIGHT = 500;
 
       const analyser = audioContext.createAnalyser();
       analyser.fftSize = 1024 * 4;
